@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nx86 - Technical Details</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Nx86</h1>
+  <p class="subtitle">A work-in-progress Switch emulator focused on native recompilation.</p>
+
+  <nav>
+    <a href="index.html">Index</a><span class="sep"></span>
+    <a href="about.html">About</a><span class="sep"></span>
+    <a href="status.html">Status</a><span class="sep"></span>
+    <a href="technical.html">Technical Details</a><span class="sep"></span>
+    <a href="legal.html">Legal</a>
+  </nav>
+
+  <div class="content">
+    <h2>Technical Details</h2>
+    <p>This page goes deeper into how Nx86 actually works. If you want the short version, check the <a href="about.html">About</a> page first.</p>
+
+    <hr>
+
+    <h2>The big picture</h2>
+    <p>The Nintendo Switch runs ARM64 (AArch64) code. A normal PC runs x86_64. These are completely different instruction sets, so you cannot just run Switch code directly on a PC &mdash; it has to be translated somehow.</p>
+    <p>Most emulators do this translation at runtime with an interpreter or a JIT compiler. Nx86 takes a different approach: it translates as much ARM64 code as possible into native x86_64 machine code <em>before</em> you hit play. The result gets saved to disk so the next launch is faster. If the emulator hits code paths it has not seen before during gameplay, it compiles those on the fly and adds them to the cache for next time.</p>
+    <p>This is what the project calls <strong>Continuous Dynamic Compilation</strong> &mdash; the cache keeps getting smarter the more you play.</p>
+
+    <hr>
+
+    <h2>The compiler pipeline</h2>
+    <p>When Nx86 compiles a piece of ARM64 code, it goes through a chain of stages. Each stage has one job and passes its output to the next one.</p>
+
+    <h3>1. Decode</h3>
+    <p>Raw ARM64 bytes get parsed into structured instruction objects. The decoder knows about arithmetic (ADD, SUB, AND, OR, XOR), moves (MOVZ), loads and stores (LDR, STR), branches (B, B.cond), comparisons (CMP, CMN), and supervisor calls (SVC). Each decoded instruction carries its address, raw bytes, what kind of instruction it is, and a human-readable disassembly string.</p>
+
+    <h3>2. Lift to NxIR</h3>
+    <p>The decoded ARM64 instructions get converted into Nx86's own intermediate representation called NxIR. This is the central layer that everything else plugs into &mdash; both the ahead-of-time compiler and the emergency JIT produce NxIR before generating any native code.</p>
+    <p>The lifter also figures out where basic blocks begin and end by looking at branch targets and what comes after terminators. Guest register state carries across blocks through explicit GetReg/SetReg operations, which keeps things simple and avoids needing phi nodes.</p>
+
+    <h3>3. Optimize</h3>
+    <p>The NxIR goes through optimization passes. Right now there is one: dead-flag elimination. ARM64 sets condition flags (NZCV) after most arithmetic operations, but a lot of the time nobody actually reads those flags before they get overwritten. The optimizer removes the redundant flag computations. The last SetFlags in a block is always kept conservatively since something outside the block might need it.</p>
+
+    <h3>4. Verify</h3>
+    <p>After lifting and after every optimization pass, a verifier runs over the NxIR. It checks that SSA properties hold (no duplicate definitions, no use-before-define), types are consistent, block terminators are legal, branch targets actually exist, and side effects line up with their results. If something is wrong, it fails early with a clear error instead of producing garbage native code.</p>
+
+    <h3>5. Lower to x86_64</h3>
+    <p>Verified NxIR gets turned into actual x86_64 machine code. There are two modes: single-block functions (no internal branches, used for the initial path) and multi-block functions (each block lowers independently, branches set the next guest PC and exit back to the dispatcher).</p>
+    <p>A linear-scan register allocator maps IR values onto a pool of six physical registers (RDX, RSI, R8, R9, R10, R11). When the pool runs out, values spill to the stack. The allocation is deterministic, so the same input always produces the same output.</p>
+    <p>The code then goes through a hand-written x86_64 assembler that emits raw bytes with correct REX prefixes, ModR/M encoding, SIB bytes, and displacement handling. It supports labels with forward-reference fixups, so you can jump to a label that has not been emitted yet.</p>
+
+    <h3>6. Package and store</h3>
+    <p>The finished native code gets packed into an <code>.nxo</code> file &mdash; a compact little-endian binary with a header (magic bytes, version, entry address, stack size), the code itself, and an FNV-1a content hash at the end for integrity checking. These files live in a managed cache directory.</p>
+
+    <hr>
+
+    <h2>NxIR in more detail</h2>
+    <p>NxIR is worth calling out because it is the thing the whole compiler revolves around. It is:</p>
+    <ul>
+      <li><strong>Typed</strong> &mdash; values have explicit types like i1, i32, i64, or flags.</li>
+      <li><strong>SSA</strong> (Static Single Assignment) &mdash; every value is defined exactly once and referenced by index. No mutation, no ambiguity about where a value came from.</li>
+      <li><strong>Close to ARM64 semantics</strong> &mdash; it does not try to be a high-level IR. Operations map fairly directly to what ARM64 does, including explicit side effects.</li>
+      <li><strong>Serializable</strong> &mdash; functions can be round-tripped through JSON, which makes debugging and testing much easier.</li>
+    </ul>
+
+    <h3>Lazy flags</h3>
+    <p>One interesting design choice is how condition flags work. On ARM64, almost every arithmetic instruction updates the NZCV flags. Computing those flags after every single operation is wasteful when most of them never get read. NxIR uses a <code>SetFlags</code> operation that just records the operands without actually computing anything. The flags only get materialized when something downstream (like a conditional branch) actually needs them. The dead-flag optimization pass can then remove any SetFlags that get overwritten before anyone reads them.</p>
+
+    <hr>
+
+    <h2>Memory and execution</h2>
+
+    <h3>Virtual memory manager</h3>
+    <p>Nx86 includes a software page table that manages a 64 GiB virtual address space with 4 KiB pages. On Linux, this is backed by a real <code>mmap</code> reservation with no physical memory committed upfront (MAP_NORESERVE). Pages can be mapped with read, write, and execute permissions, and the system handles cross-page accesses and permission faults correctly.</p>
+
+    <h3>W^X enforcement</h3>
+    <p>When native code needs to run, the JIT allocates memory pages, copies the code in while they are writable, then switches them to read+execute before any function pointer is created. This is the standard W^X (write XOR execute) policy &mdash; memory is never both writable and executable at the same time. It is a security measure borrowed from how modern operating systems handle code loading.</p>
+
+    <h3>Guest CPU state</h3>
+    <p>The emulator models the full AArch64 guest state: 31 general-purpose 64-bit registers, the stack pointer, the program counter, NZCV flags (stored as individual booleans), 32 128-bit floating-point/SIMD registers, and the floating-point control and status registers. The native code reads and writes this state through a pointer passed as the first argument to every generated function.</p>
+
+    <hr>
+
+    <h2>The cache system</h2>
+    <p>Compiled native blocks get stored as <code>.nxo</code> files in a managed cache directory. The cache manager can scan the directory, validate files by checking their headers (cheap) or their full content hashes (thorough), insert new blocks, load existing ones, and clear everything out.</p>
+    <p>Writes go to temporary files first and get moved into place atomically, so a crash mid-write will not corrupt an existing cached block.</p>
+    <p>On subsequent launches, previously compiled blocks are loaded directly from disk instead of being recompiled. This is the main thing that makes the "compile before play" approach practical &mdash; you pay the compilation cost once, not every time.</p>
+
+    <hr>
+
+    <h2>Continuous Dynamic Compilation</h2>
+    <p>The compile-then-play loop works like this:</p>
+    <ol>
+      <li>Before launch, the compiler scans the game's code and translates as much as it can find into native x86_64 blocks.</li>
+      <li>The dispatcher runs native blocks in sequence, looking up each one by guest PC.</li>
+      <li>If the dispatcher reaches a guest PC that has no cached native block, the emergency JIT kicks in. It compiles that single block on the spot, saves it to the cache, installs it in the dispatcher, and keeps going.</li>
+      <li>Next time you launch the same game, that block is already in the cache. The JIT path gets shorter every session.</li>
+    </ol>
+    <p>The emergency JIT uses the exact same compiler pipeline as the ahead-of-time path. It just prioritizes speed over optimization depth. Blocks it discovers get persisted for reuse, so the cache gradually fills in the gaps.</p>
+    <p>The main metric for tracking progress is called <strong>Native Coverage</strong>. It measures how much of a game's code has been translated to native output, not just how many bytes have been compiled. The bands are: Terrible (0&ndash;60%), Poor (60&ndash;90%), Great (90&ndash;98%), Excellent (98&ndash;100%), and Perfect (100%).</p>
+
+    <hr>
+
+    <h2>Testing</h2>
+    <p>Nx86 uses three-way differential testing, which is a fancy way of saying the same program gets run three different ways and the results are compared against each other.</p>
+    <ul>
+      <li><strong>Interpreter</strong> &mdash; a straightforward ARM64 interpreter that executes decoded instructions one at a time against guest memory. This is the ground truth.</li>
+      <li><strong>NxIR evaluator</strong> &mdash; an independent evaluator that runs the IR directly against guest memory. If this agrees with the interpreter, the lifting step is correct.</li>
+      <li><strong>Native execution</strong> &mdash; the actual x86_64 machine code generated by the compiler. If this also agrees, the full pipeline from ARM64 to native code is working.</li>
+    </ul>
+    <p>All three must produce identical final register states and observable memory contents. If any of them disagree, something is wrong in the pipeline and the test fails.</p>
+    <p>Test programs are defined as TOML files with hex-encoded ARM64 bytes, expected register values, expected memory ranges, and optional framebuffer specifications. These synthetic tests let the compiler be validated without needing real Switch software.</p>
+
+    <hr>
+
+    <h2>Current limits</h2>
+    <p>The decoder handles a subset of ARM64: arithmetic with immediates, logical operations with no shift, unconditional and conditional branches, basic loads and stores (unsigned immediate, 32-bit and 64-bit), moves, comparisons, and supervisor calls. That is enough for synthetic test programs but nowhere near enough for real Switch games yet.</p>
+    <p>Conditional branches in native multi-block functions are not fully wired up. The register allocator operates on single blocks with no cross-block awareness. There is no floating-point or SIMD support yet. The GUI works on Linux with both Wayland and X11, but native code execution only runs on x86_64 Linux &mdash; other hosts get a clean "unsupported" message rather than a crash.</p>
+    <p>The project is developed on Apple Silicon (aarch64-apple-darwin) but targets Linux x86_64-v4. The pure-logic parts (decoder, lifter, IR, verifier, tests) run on any platform. The native execution path is Linux-only for now.</p>
+
+    <hr>
+
+    <h2>The codebase</h2>
+    <p>Nx86 is a Rust workspace monorepo with around 35 crates, each one covering a distinct part of the system. The project enforces strict code quality: <code>unsafe</code> usage, <code>unwrap()</code>, <code>todo!()</code>, and <code>dbg!()</code> are all treated as warnings, and CI runs clippy with <code>-D warnings</code> so they break the build. Any new <code>unsafe</code> block requires an explicit safety comment explaining why it is sound.</p>
+
+    <footer>nx86.dev</footer>
+  </div>
+
+</body>
+</html>
