@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nx86 - Status</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Nx86</h1>
+  <p class="subtitle">A work-in-progress Switch emulator focused on native recompilation.</p>
+
+  <nav>
+    <a href="index.html">Index</a><span class="sep"></span>
+    <a href="about.html">About</a><span class="sep"></span>
+    <a href="status.html">Status</a><span class="sep"></span>
+    <a href="legal.html">Legal</a>
+  </nav>
+
+  <div class="content">
+    <h2>Status</h2>
+    <p>This is still a prototype. The useful work right now is mostly inside the compiler pipeline, tests, and storage format.</p>
+
+    <hr>
+
+    <h2>Now</h2>
+    <ul>
+      <li>Synthetic ARM64 programs can move through the early pipeline.</li>
+      <li>NxIR exists as the shared middle layer.</li>
+      <li>There is a first tiny native block path for x86_64.</li>
+      <li>Local phase notes include register allocation and a first object format.</li>
+    </ul>
+
+    <hr>
+
+    <h2>Not yet</h2>
+    <ul>
+      <li>No public downloads.</li>
+      <li>No game import.</li>
+      <li>No firmware, keys, or bundled system files.</li>
+      <li>No homebrew execution yet.</li>
+    </ul>
+
+    <hr>
+
+    <h2>Next</h2>
+    <ul>
+      <li>Cache manager.</li>
+      <li>Dispatcher.</li>
+      <li>Emergency JIT path.</li>
+      <li>Profile-guided rebuilds.</li>
+    </ul>
+
+    <footer>nx86.dev</footer>
+  </div>
+
+</body>
+</html>

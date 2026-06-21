@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nx86 - About</title>
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Nx86</h1>
+  <p class="subtitle">A work-in-progress Switch emulator focused on native recompilation.</p>
+
+  <nav>
+    <a href="index.html">Index</a><span class="sep"></span>
+    <a href="about.html">About</a><span class="sep"></span>
+    <a href="status.html">Status</a><span class="sep"></span>
+    <a href="legal.html">Legal</a>
+  </nav>
+
+  <div class="content">
+    <h2>What it is</h2>
+    <p>Nx86 is a GUI-first Switch emulator written in Rust. The first target is Linux on desktop x86_64-v4 hardware.</p>
+
+    <hr>
+
+    <h2>How it works</h2>
+    <p>The rough loop is compile before play, watch for fallback paths at runtime, then rebuild the cache with what the emulator learned.</p>
+    <p>The goal is to move more work out of the hot path over time instead of leaning on a constant interpreter or JIT path.</p>
+
+    <hr>
+
+    <h2>Why</h2>
+    <p>Instant startup is not the point. Nx86 trades more up-front compilation for the chance at smoother native-style execution later.</p>
+    <p>Most of the project is still compiler and runtime groundwork. The user-facing emulator is not there yet.</p>
+
+    <footer>nx86.dev</footer>
+  </div>
+
+</body>
+</html>

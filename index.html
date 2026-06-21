@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nx86</title>
+  <meta name="description" content="A work-in-progress Switch emulator focused on native recompilation.">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <h1>Nx86</h1>
+  <p class="subtitle">A work-in-progress Switch emulator focused on native recompilation.</p>
+
+  <nav>
+    <a href="index.html">Index</a><span class="sep"></span>
+    <a href="about.html">About</a><span class="sep"></span>
+    <a href="status.html">Status</a><span class="sep"></span>
+    <a href="legal.html">Legal</a>
+  </nav>
+
+  <div class="content">
+    <p>Nx86 is an emulator project. The bet is simple: compile as much as possible before launch, use runtime feedback to find what was missed, then rebuild better native code.</p>
+
+    <h3>Pipeline</h3>
+    <p class="pipeline">AArch64 -&gt; NxIR -&gt; x86_64-v4</p>
+
+    <p class="muted">No downloads yet. It does not run Switch games yet.</p>
+
+    <h3>Right now</h3>
+    <ul>
+      <li>Compiler plumbing</li>
+      <li>Synthetic ARM64 tests</li>
+      <li>A small Linux GUI</li>
+      <li>x86_64-v4 as the first target</li>
+    </ul>
+
+    <footer>nx86.dev</footer>
+  </div>
+
+</body>
+</html>

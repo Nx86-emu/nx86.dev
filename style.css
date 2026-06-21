@@ -1,0 +1,86 @@
+:root {
+  --fg: #1f2328;
+  --bg: #fff;
+  --accent: LinkText;
+  --muted: #656d76;
+}
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #e6edf3;
+    --bg: #0d1117;
+    --accent: #88f;
+    --muted: #8b949e;
+    color-scheme: dark;
+  }
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html {
+  font-family: sans-serif;
+  font-size: 100%;
+  color: var(--fg);
+  background: var(--bg);
+}
+body { min-height: 100vh; padding: 6px; }
+h1 {
+  font-size: 1.875rem;
+  line-height: 2.25rem;
+  font-weight: 700;
+  text-align: center;
+  margin-top: 20px;
+  margin-bottom: 4px;
+}
+.subtitle {
+  text-align: center;
+  color: var(--muted);
+  margin-bottom: 20px;
+}
+nav {
+  text-align: center;
+  margin-bottom: 28px;
+}
+nav a {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 0.95rem;
+}
+nav a:visited { color: var(--muted); }
+nav a:hover { color: var(--fg); }
+nav span.sep { color: var(--muted); margin: 0 2px; }
+nav span.sep::before { content: " | "; }
+.content {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 60rem;
+}
+a:link, a:visited { color: var(--accent); }
+a:hover { text-decoration: none; }
+h2 {
+  font-size: 1.25rem;
+  font-weight: 500;
+  margin-top: 20px;
+  margin-bottom: 8px;
+}
+h3 {
+  font-size: 1.1rem;
+  font-weight: 500;
+  margin-top: 16px;
+  margin-bottom: 6px;
+}
+p { margin-top: 6px; margin-bottom: 6px; line-height: 1.6; }
+.pipeline { font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; }
+ul, ol { padding-left: 24px; margin-top: 6px; margin-bottom: 6px; }
+li { margin: 2px 0; line-height: 1.5; }
+hr { border: none; border-top: 1px solid var(--muted); margin: 16px 0; opacity: 0.3; }
+table { border-collapse: collapse; margin: 8px 0; }
+th, td { text-align: left; padding: 2px 12px 2px 0; font-size: 0.95rem; }
+th { font-weight: 500; }
+.muted { color: var(--muted); }
+footer {
+  margin-top: 40px;
+  padding-top: 12px;
+  border-top: 1px solid var(--muted);
+  border-top-opacity: 0.2;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+}
