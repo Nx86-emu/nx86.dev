@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nx86 - Blog</title>
+  <meta name="description" content="Development log and updates from the Nx86 emulator project.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Nx86">
+  <meta property="og:title" content="Nx86 - Blog">
+  <meta property="og:description" content="Development log and updates from the Nx86 emulator project.">
+  <meta property="og:url" content="https://nx86.dev/blog.html">
+  <link rel="canonical" href="https://nx86.dev/blog.html">
+  <meta name="theme-color" content="#0d1117">
+  <link rel="icon" href="favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <a href="index.html"><img src="logo.svg" alt="Nx86" class="logo"></a>
+  <p class="subtitle">A work-in-progress Switch emulator focused on native recompilation.</p>
+
+  <nav>
+    <a href="index.html">Index</a><span class="sep"></span>
+    <a href="about.html">About</a><span class="sep"></span>
+    <a href="status.html">Status</a><span class="sep"></span>
+    <a href="technical.html">Technical Details</a><span class="sep"></span>
+    <a href="blog.html">Blog</a><span class="sep"></span>
+    <a href="legal.html">Legal</a>
+  </nav>
+
+  <div class="content">
+    <div id="posts">
+
+      <article data-date="2026-06-21">
+        <h2>Hello, Nx86</h2>
+        <p class="muted">June 21, 2026</p>
+        <p>This is the start of something I have been thinking about for a while. Nx86 is a Switch emulator, but not the kind you are probably used to. Instead of interpreting or JIT-compiling game code at runtime, the idea is to translate as much as possible into native x86_64 machine code before you even hit play. The result gets cached to disk, so the next time you launch the same game, it is already compiled.</p>
+        <p>The core bet is this: if you are willing to wait longer on the first launch, you get smoother, more native-feeling execution after that. And if the emulator runs into code paths it has not seen before during gameplay, it compiles those on the spot and adds them to the cache. The cache gets smarter every time you play. The project calls this <strong>Continuous Dynamic Compilation</strong>.</p>
+        <p>Right now the project is mostly compiler groundwork. The pipeline goes from raw ARM64 bytes through a decoder, into an intermediate representation called NxIR, through a register allocator and a hand-written x86_64 assembler, and out the other side as native machine code. Synthetic test programs can travel the full path already. Three-way differential testing (interpreter vs IR evaluator vs native execution) keeps things honest.</p>
+        <p>What is not there yet: real game execution, a public build, homebrew support, or anything you can download. The GUI exists as a small Linux app built with egui, but it is mostly a test harness right now.</p>
+        <p>What is next: a cache manager for persisting compiled blocks, a multi-block dispatcher for running them in sequence, and an emergency JIT path that kicks in when the emulator hits uncompiled code at runtime.</p>
+        <p>The project is written in Rust, lives in a monorepo with around 35 crates, and targets Linux x86_64-v4 as the first platform. The code is developed on Apple Silicon but the pure-logic parts run anywhere. Native execution is Linux-only for now.</p>
+        <p>If you want to follow along, the code is on <a href="https://github.com/nx86-emu">GitHub</a>.</p>
+      </article>
+
+      <!--
+      <article data-date="YYYY-MM-DD">
+        <h2>Post title</h2>
+        <p class="muted">Month DD, YYYY</p>
+        <p>Body text goes here. Use regular HTML for formatting &mdash; paragraphs, links, bold, lists, whatever you need.</p>
+        <p>Second paragraph.</p>
+      </article>
+      -->
+
+    </div>
+
+    <script>
+    (function () {
+      var container = document.getElementById('posts');
+      if (!container) return;
+      var articles = Array.prototype.slice.call(container.querySelectorAll('article[data-date]'));
+      articles.sort(function (a, b) {
+        return b.getAttribute('data-date').localeCompare(a.getAttribute('data-date'));
+      });
+      for (var i = 0; i < articles.length; i++) {
+        container.appendChild(articles[i]);
+      }
+    })();
+    </script>
+
+    <footer>nx86.dev &middot; <a href="https://github.com/nx86-emu">GitHub</a></footer>
+  </div>
+
+  <script src="nav.js"></script>
+</body>
+</html>

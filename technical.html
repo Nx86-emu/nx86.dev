@@ -4,12 +4,21 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nx86 - Technical Details</title>
+  <meta name="description" content="How Nx86 works under the hood — the compiler pipeline, NxIR, memory model, and testing.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Nx86">
+  <meta property="og:title" content="Nx86 - Technical Details">
+  <meta property="og:description" content="How Nx86 works under the hood — the compiler pipeline, NxIR, memory model, and testing.">
+  <meta property="og:url" content="https://nx86.dev/technical.html">
+  <link rel="canonical" href="https://nx86.dev/technical.html">
+  <meta name="theme-color" content="#0d1117">
   <link rel="icon" href="favicon.svg" type="image/svg+xml">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-  <h1>Nx86</h1>
+  <a href="index.html"><img src="logo.svg" alt="Nx86" class="logo"></a>
   <p class="subtitle">A work-in-progress Switch emulator focused on native recompilation.</p>
 
   <nav>
@@ -17,6 +26,7 @@
     <a href="about.html">About</a><span class="sep"></span>
     <a href="status.html">Status</a><span class="sep"></span>
     <a href="technical.html">Technical Details</a><span class="sep"></span>
+    <a href="blog.html">Blog</a><span class="sep"></span>
     <a href="legal.html">Legal</a>
   </nav>
 
@@ -128,8 +138,9 @@
     <h2>The codebase</h2>
     <p>Nx86 is a Rust workspace monorepo with around 35 crates, each one covering a distinct part of the system. The project enforces strict code quality: <code>unsafe</code> usage, <code>unwrap()</code>, <code>todo!()</code>, and <code>dbg!()</code> are all treated as warnings, and CI runs clippy with <code>-D warnings</code> so they break the build. Any new <code>unsafe</code> block requires an explicit safety comment explaining why it is sound.</p>
 
-    <footer>nx86.dev</footer>
+    <footer>nx86.dev &middot; <a href="https://github.com/nx86-emu">GitHub</a></footer>
   </div>
 
+  <script src="nav.js"></script>
 </body>
 </html>
