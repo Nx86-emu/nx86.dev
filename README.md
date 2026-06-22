@@ -2,7 +2,7 @@
 
 ### Development
 ```bash
-bunx server
+bunx serve
 # or
 npx http-server
 ```
