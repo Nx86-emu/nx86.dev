@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nx86 - NDX: nxmod.toml Reference</title>
+  <meta name="description" content="Complete reference for the nxmod.toml manifest used in Nx86 NDX mod packages.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Nx86">
+  <meta property="og:title" content="Nx86 - NDX: nxmod.toml Reference">
+  <meta property="og:description" content="Complete reference for the nxmod.toml manifest used in Nx86 NDX mod packages.">
+  <meta property="og:url" content="https://nx86.dev/ndx/nxmod.html">
+  <link rel="canonical" href="https://nx86.dev/ndx/nxmod.html">
+  <meta name="theme-color" content="#0d1117">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+  <a href="../index.html"><img src="../logo.svg" alt="Nx86" class="logo"></a>
+  <p class="subtitle">A work-in-progress Switch emulator focused on native recompilation.</p>
+
+  <nav>
+    <a href="../index.html">Index</a><span class="sep"></span>
+    <a href="../about.html">About</a><span class="sep"></span>
+    <a href="../status.html">Status</a><span class="sep"></span>
+    <a href="../technical.html">Technical Details</a><span class="sep"></span>
+    <a href="index.html">NDX</a><span class="sep"></span>
+    <a href="../blog.html">Blog</a><span class="sep"></span>
+    <a href="../legal.html">Legal</a>
+  </nav>
+
+  <div class="content">
+    <h2>nxmod.toml Reference</h2>
+    <p class="muted"><a href="index.html">Overview</a> · <a href="installing.html">Installing</a> · <a href="eden.html">Eden Imports</a> · <a href="creating.html">Creating .ndx</a> · <strong>nxmod.toml</strong> · <a href="profiles.html">Profiles</a> · <a href="cache.html">Cache</a> · <a href="cheats.html">Cheats</a> · <a href="gso.html">GSO/GSC</a> · <a href="repos.html">Repositories</a> · <a href="safety.html">Safety</a> · <a href="ai.html">AI Guide</a></p>
+
+    <hr>
+
+    <pre>[mod]
+id = "example_mod"
+name = "Example Mod"
+version = "1.0.0"
+format = "ndx"
+author = "Example Author"
+description = "Short description of the mod."
+license = "Unknown"
+
+[target]
+title_id = "0100000000000000"
+game_version = "optional"
+build_id = "optional"
+
+[content]
+romfs = true
+romfs_ext = false
+exefs = false
+cheats = false
+native = false
+lua = false
+
+[cache]
+impact = "runtime-only"
+affects_executable = false
+partial_recompile_supported = false
+
+[security]
+requires_native_code = false
+requires_lua = false
+requires_network = false
+requires_filesystem = false
+
+[repository]
+source = "https://example.com/source"
+update_url = "https://example.com/update"</pre>
+
+    <hr>
+
+    <h3>[mod]</h3>
+    <table>
+      <tr><th>Field</th><th>Description</th></tr>
+      <tr><td><code>id</code></td><td>Unique identifier. Lowercase letters, digits, underscores.</td></tr>
+      <tr><td><code>name</code></td><td>Display name shown in the mod UI.</td></tr>
+      <tr><td><code>version</code></td><td>Version string. Semantic versioning recommended.</td></tr>
+      <tr><td><code>format</code></td><td>Must be <code>"ndx"</code>.</td></tr>
+      <tr><td><code>author</code></td><td>Author name or handle.</td></tr>
+      <tr><td><code>description</code></td><td>One or two sentences shown in the mod list.</td></tr>
+      <tr><td><code>license</code></td><td>SPDX identifier (e.g. <code>"MIT"</code>) or <code>"Unknown"</code>.</td></tr>
+    </table>
+
+    <hr>
+
+    <h3>[target]</h3>
+    <table>
+      <tr><th>Field</th><th>Description</th></tr>
+      <tr><td><code>title_id</code></td><td>16-character hex Title ID. Required.</td></tr>
+      <tr><td><code>game_version</code></td><td>Target game version. Omit if version-agnostic.</td></tr>
+      <tr><td><code>build_id</code></td><td>Target Build ID. Required for ExeFS mods and cheats.</td></tr>
+    </table>
+
+    <hr>
+
+    <h3>[content]</h3>
+    <table>
+      <tr><th>Field</th><th>Default</th><th>Description</th></tr>
+      <tr><td><code>romfs</code></td><td><code>false</code></td><td>Includes a <code>romfs/</code> overlay.</td></tr>
+      <tr><td><code>romfs_ext</code></td><td><code>false</code></td><td>Includes <code>romfs_ext/</code>.</td></tr>
+      <tr><td><code>exefs</code></td><td><code>false</code></td><td>Includes ExeFS patches.</td></tr>
+      <tr><td><code>cheats</code></td><td><code>false</code></td><td>Includes cheat code files.</td></tr>
+      <tr><td><code>native</code></td><td><code>false</code></td><td>Includes a compiled native module. Requires explicit trust.</td></tr>
+      <tr><td><code>lua</code></td><td><code>false</code></td><td>Includes Lua scripts. Requires explicit trust.</td></tr>
+    </table>
+
+    <hr>
+
+    <h3>[cache]</h3>
+    <table>
+      <tr><th>Field</th><th>Description</th></tr>
+      <tr><td><code>impact</code></td><td>Declared cache impact value. See below.</td></tr>
+      <tr><td><code>affects_executable</code></td><td><code>true</code> if the mod changes game executable code.</td></tr>
+      <tr><td><code>partial_recompile_supported</code></td><td><code>true</code> if a partial rebuild is safe. Only valid when <code>affects_executable</code> is <code>true</code>.</td></tr>
+    </table>
+
+    <h3>cache.impact values</h3>
+    <table>
+      <tr><th>Value</th><th>Meaning</th></tr>
+      <tr><td><code>no-rebuild</code></td><td>Does not affect compiled output or asset caches.</td></tr>
+      <tr><td><code>runtime-only</code></td><td>Applied at runtime, no cache changes needed.</td></tr>
+      <tr><td><code>asset-cache</code></td><td>Asset index update needed, no native recompile.</td></tr>
+      <tr><td><code>partial-native-rebuild</code></td><td>A subset of compiled blocks is invalidated and rebuilt.</td></tr>
+      <tr><td><code>full-profile-rebuild</code></td><td>All compiled output for the game is rebuilt.</td></tr>
+      <tr><td><code>unsupported</code></td><td>Cannot be applied with the current Nx86 version.</td></tr>
+    </table>
+
+    <hr>
+
+    <h3>[security]</h3>
+    <table>
+      <tr><th>Field</th><th>Description</th></tr>
+      <tr><td><code>requires_native_code</code></td><td>Mod includes a native binary module running inside Nx86.</td></tr>
+      <tr><td><code>requires_lua</code></td><td>Mod includes Lua scripts.</td></tr>
+      <tr><td><code>requires_network</code></td><td>Mod makes network requests.</td></tr>
+      <tr><td><code>requires_filesystem</code></td><td>Mod accesses the host filesystem beyond its own package directory.</td></tr>
+    </table>
+
+    <hr>
+
+    <h3>[repository]</h3>
+    <table>
+      <tr><th>Field</th><th>Description</th></tr>
+      <tr><td><code>source</code></td><td>URL of the mod's source repository or homepage.</td></tr>
+      <tr><td><code>update_url</code></td><td>URL Nx86 checks for newer versions.</td></tr>
+    </table>
+
+    <footer>nx86.dev &middot; <a href="https://github.com/nx86-emu">GitHub</a></footer>
+  </div>
+
+  <script src="../nav.js"></script>
+</body>
+</html>

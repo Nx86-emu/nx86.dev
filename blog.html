@@ -26,12 +26,22 @@
     <a href="about.html">About</a><span class="sep"></span>
     <a href="status.html">Status</a><span class="sep"></span>
     <a href="technical.html">Technical Details</a><span class="sep"></span>
+    <a href="ndx/index.html">NDX</a><span class="sep"></span>
     <a href="blog.html">Blog</a><span class="sep"></span>
     <a href="legal.html">Legal</a>
   </nav>
 
   <div class="content">
     <div id="posts">
+
+      <article data-date="2026-06-24">
+        <h2>33 Phases Done</h2>
+        <p class="muted">June 24, 2026</p>
+        <p>Nx86 has reached the end of Phase 32 (Memory Mirroring). That is 33 completed phases since the project started. The compiler pipeline, runtime, memory system, and GUI shell are all functional and covered by 215 differential tests.</p>
+        <p>Since the first post, the project has landed a multi-block dispatcher, an emergency JIT that compiles missing blocks on the fly, block chaining with guarded native exits, fastmem and slowmem for guest memory access, a runtime profiling system, profile-guided rebuilds, a CFG recovery pass, guard and deopt metadata, and a memory mirroring subsystem. The Inspector can show disassembly, CFG, NxIR dumps, and native mappings for any compiled function.</p>
+        <p>What is next: self-modifying code support (Phase 33), atomics (Phase 34), barrier semantics (Phase 35), and guest threading (Phase 36). These are the building blocks needed before real Switch software can start running.</p>
+        <p>The project is still not usable as an emulator. There are no public downloads, no game import, and no homebrew execution. But the foundation is getting solid. The code is on <a href="https://github.com/nx86-emu">GitHub</a>.</p>
+      </article>
 
       <article data-date="2026-06-21">
         <h2>Hello, Nx86</h2>

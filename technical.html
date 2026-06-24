@@ -26,6 +26,7 @@
     <a href="about.html">About</a><span class="sep"></span>
     <a href="status.html">Status</a><span class="sep"></span>
     <a href="technical.html">Technical Details</a><span class="sep"></span>
+    <a href="ndx/index.html">NDX</a><span class="sep"></span>
     <a href="blog.html">Blog</a><span class="sep"></span>
     <a href="legal.html">Legal</a>
   </nav>
@@ -103,6 +104,37 @@
 
     <hr>
 
+    <h2>Block chaining</h2>
+    <p>When the dispatcher finishes one native block, it normally looks up the next guest PC in the chain cache and jumps to the matching native block. That lookup is fast, but it is still a hash-table hit on every block exit. Block chaining eliminates that overhead for hot paths.</p>
+    <p>After two blocks execute back-to-back enough times, the runtime patches the exit of the first block to jump directly to the second. The patch site is a writable landing pad that gets flipped from a &ldquo;go to dispatcher&rdquo; stub to a &ldquo;go to next block&rdquo; jump. The whole thing respects W^X &mdash; the landing pad is writable during patching and read+execute afterward.</p>
+    <p>If a cached block gets invalidated (for example, by self-modifying code in a future phase), all chains that point to it get torn down and the dispatcher path re-takes over until new chains form.</p>
+
+    <hr>
+
+    <h2>Fastmem and slowmem</h2>
+    <p>Guest memory accesses go through one of two paths.</p>
+    <p><strong>Fastmem</strong> is the fast path. The 64 GiB guest arena is mapped at a fixed base address, and the native code can compute a guest address and load or store directly through that base with no function call overhead. A bounds check against the arena size keeps things safe. If the address is in range and the page permissions allow it, the access completes in a handful of instructions.</p>
+    <p><strong>Slowmem</strong> is the fallback. When fastmem cannot handle an access &mdash; the page is not mapped, the permissions are wrong, or the access crosses a page boundary &mdash; the generated code calls into a runtime helper that does the full software page-table walk, reports faults, and logs the event. Every slowmem hit gets counted and written into the runtime profile, so the profile-guided rebuild can see which code paths are expensive and try to optimize them away next time.</p>
+
+    <hr>
+
+    <h2>Memory mirroring</h2>
+    <p>Some Switch titles map the same physical memory at multiple virtual addresses. Nx86 handles this by mirroring &mdash; multiple guest addresses resolve to the same underlying arena page. In release mode, mirrored accesses go through the fastmem path transparently. In debug mode, mirroring is disabled so that aliasing bugs surface as clean faults instead of silent corruption.</p>
+
+    <hr>
+
+    <h2>Guard and deopt metadata</h2>
+    <p>NxIR supports a <code>Guard</code> terminator that checks a boolean condition at runtime. If the condition holds, execution continues to the normal successor block. If it fails, the runtime jumps to a deoptimization handler that can reconstruct the full guest CPU state from a metadata table.</p>
+    <p>Each function carries a deopt-point table that maps guard IDs to the register state that was live at that point. This is the foundation for future speculative optimization &mdash; the compiler can make optimistic assumptions, guard them, and fall back safely if the assumption turns out to be wrong.</p>
+
+    <hr>
+
+    <h2>Runtime profiling</h2>
+    <p>Every session produces a versioned JSONL profile file. Events include JIT block compilations, block-chaining decisions, slowmem hits, branch targets, and helper calls. The format is append-only and crash-safe &mdash; if the emulator crashes mid-session, the tail of the file can still be recovered and parsed.</p>
+    <p>The profile-guided rebuild reads these files to decide which JIT-compiled blocks should be promoted to ahead-of-time objects. Blocks that ran frequently enough get recompiled with full optimization and stored in the cache for the next launch.</p>
+
+    <hr>
+
     <h2>Continuous Dynamic Compilation</h2>
     <p>The compile-then-play loop works like this:</p>
     <ol>
@@ -130,13 +162,13 @@
 
     <h2>Current limits</h2>
     <p>The decoder handles a subset of ARM64: arithmetic with immediates, logical operations with no shift, unconditional and conditional branches, basic loads and stores (unsigned immediate, 32-bit and 64-bit), moves, comparisons, and supervisor calls. That is enough for synthetic test programs but nowhere near enough for real Switch games yet.</p>
-    <p>Conditional branches in native multi-block functions are not fully wired up. The register allocator operates on single blocks with no cross-block awareness. There is no floating-point or SIMD support yet. The GUI works on Linux with both Wayland and X11, but native code execution only runs on x86_64 Linux &mdash; other hosts get a clean "unsupported" message rather than a crash.</p>
+    <p>The register allocator operates on single blocks with no cross-block awareness. There is no floating-point or SIMD support yet, no atomics or barrier semantics, and no guest threading. The GUI works on Linux with both Wayland and X11, but native code execution only runs on x86_64 Linux &mdash; other hosts get a clean "unsupported" message rather than a crash.</p>
     <p>The project is developed on Apple Silicon (aarch64-apple-darwin) but targets Linux x86_64-v4. The pure-logic parts (decoder, lifter, IR, verifier, tests) run on any platform. The native execution path is Linux-only for now.</p>
 
     <hr>
 
     <h2>The codebase</h2>
-    <p>Nx86 is a Rust workspace monorepo with around 35 crates, each one covering a distinct part of the system. The project enforces strict code quality: <code>unsafe</code> usage, <code>unwrap()</code>, <code>todo!()</code>, and <code>dbg!()</code> are all treated as warnings, and CI runs clippy with <code>-D warnings</code> so they break the build. Any new <code>unsafe</code> block requires an explicit safety comment explaining why it is sound.</p>
+    <p>Nx86 is a Rust workspace monorepo with 33 crates &mdash; 21 active, 11 skeleton placeholders, and 1 partial. Each crate covers a distinct part of the system. The project enforces strict code quality: <code>unsafe</code> usage, <code>unwrap()</code>, <code>todo!()</code>, and <code>dbg!()</code> are all treated as warnings, and CI runs clippy with <code>-D warnings</code> so they break the build. Any new <code>unsafe</code> block requires an explicit safety comment explaining why it is sound.</p>
 
     <footer>nx86.dev &middot; <a href="https://github.com/nx86-emu">GitHub</a></footer>
   </div>

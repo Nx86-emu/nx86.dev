@@ -26,22 +26,35 @@
     <a href="about.html">About</a><span class="sep"></span>
     <a href="status.html">Status</a><span class="sep"></span>
     <a href="technical.html">Technical Details</a><span class="sep"></span>
+    <a href="ndx/index.html">NDX</a><span class="sep"></span>
     <a href="blog.html">Blog</a><span class="sep"></span>
     <a href="legal.html">Legal</a>
   </nav>
 
   <div class="content">
     <h2>Status</h2>
-    <p>This is still a prototype. The useful work right now is mostly inside the compiler pipeline, tests, and storage format.</p>
+    <p>Nx86 has completed 33 development phases (Phase 0 through Phase 32). The compiler pipeline, runtime, memory system, and GUI shell are all functional. The project cannot run real Switch games yet.</p>
 
     <hr>
 
     <h2>Now</h2>
     <ul>
-      <li>Synthetic ARM64 programs can move through the early pipeline.</li>
-      <li>NxIR exists as the shared middle layer.</li>
-      <li>There is a first tiny native block path for x86_64.</li>
-      <li>Local phase notes include register allocation and a first object format.</li>
+      <li>Synthetic ARM64 programs travel the full compiler pipeline: decode, lift to NxIR, optimize, verify, lower to x86_64, package as .nxo.</li>
+      <li>NxIR exists as a typed SSA intermediate representation with a verifier and dead-flag elimination.</li>
+      <li>Multi-block native execution through a dispatcher with guest PC lookup and block exit handling.</li>
+      <li>Emergency JIT compiles missing blocks on the fly and adds them to the cache.</li>
+      <li>Block chaining with guarded native exits and W^X patching (feature-gated).</li>
+      <li>Fastmem: direct guest memory access through a 64 GiB mmap arena with checked fallback.</li>
+      <li>Slowmem: fallback load/store helpers with counters, fault reporting, and coverage penalties.</li>
+      <li>Memory mirroring with release/debug mode support.</li>
+      <li>Guard and deopt metadata for future speculative optimization.</li>
+      <li>Cache manager with .nxo integrity checking, manifest, and atomic writes.</li>
+      <li>Runtime profiling: versioned JSONL profiles with typed events, crash-tail recovery, and file locking.</li>
+      <li>Profile-guided rebuild promotes JIT-discovered blocks to AOT objects.</li>
+      <li>CFG recovery via recursive-descent traversal.</li>
+      <li>Inspector with disassembly, CFG, NxIR dump, and native mapping views.</li>
+      <li>GUI shell with Library, Compile, Tests, Settings, and Inspector screens (egui, Linux).</li>
+      <li>215 differential tests — interpreter, NxIR evaluator, and native execution must all agree.</li>
     </ul>
 
     <hr>
@@ -49,19 +62,25 @@
     <h2>Not yet</h2>
     <ul>
       <li>No public downloads.</li>
-      <li>No game import.</li>
+      <li>No game import or title boot.</li>
       <li>No firmware, keys, or bundled system files.</li>
       <li>No homebrew execution yet.</li>
+      <li>No floating-point or SIMD/NEON support.</li>
+      <li>No conditional branch lowering in native multi-block functions.</li>
+      <li>No atomics or barrier semantics.</li>
+      <li>No guest threading.</li>
+      <li>No Vulkan rendering or shader translation.</li>
+      <li>No Windows or macOS native execution.</li>
     </ul>
 
     <hr>
 
     <h2>Next</h2>
     <ul>
-      <li>Cache manager.</li>
-      <li>Dispatcher.</li>
-      <li>Emergency JIT path.</li>
-      <li>Profile-guided rebuilds.</li>
+      <li>Phase 33: Self-Modifying Code Support — executable page write detection, object and chain invalidation.</li>
+      <li>Phase 34: Atomics v0 — exclusive monitor model, LDXR/STXR subset, acquire/release.</li>
+      <li>Phase 35: Barrier Semantics v0 — DMB/DSB/ISB subset.</li>
+      <li>Phase 36: Guest Threading v0 — thread state isolation, scheduler skeleton.</li>
     </ul>
 
     <footer>nx86.dev &middot; <a href="https://github.com/nx86-emu">GitHub</a></footer>

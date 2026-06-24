@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Nx86 - NDX: Installing Mods</title>
+  <meta name="description" content="How to install mods in Nx86 — drag-and-drop import, supported formats, and what Nx86 does at each step.">
+  <meta name="robots" content="index, follow">
+  <meta property="og:type" content="website">
+  <meta property="og:site_name" content="Nx86">
+  <meta property="og:title" content="Nx86 - NDX: Installing Mods">
+  <meta property="og:description" content="How to install mods in Nx86 — drag-and-drop import, supported formats, and what Nx86 does at each step.">
+  <meta property="og:url" content="https://nx86.dev/ndx/installing.html">
+  <link rel="canonical" href="https://nx86.dev/ndx/installing.html">
+  <meta name="theme-color" content="#0d1117">
+  <link rel="icon" href="../favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="../style.css">
+</head>
+<body>
+
+  <a href="../index.html"><img src="../logo.svg" alt="Nx86" class="logo"></a>
+  <p class="subtitle">A work-in-progress Switch emulator focused on native recompilation.</p>
+
+  <nav>
+    <a href="../index.html">Index</a><span class="sep"></span>
+    <a href="../about.html">About</a><span class="sep"></span>
+    <a href="../status.html">Status</a><span class="sep"></span>
+    <a href="../technical.html">Technical Details</a><span class="sep"></span>
+    <a href="index.html">NDX</a><span class="sep"></span>
+    <a href="../blog.html">Blog</a><span class="sep"></span>
+    <a href="../legal.html">Legal</a>
+  </nav>
+
+  <div class="content">
+    <h2>Installing Mods</h2>
+    <p class="muted"><a href="index.html">Overview</a> · <strong>Installing</strong> · <a href="eden.html">Eden Imports</a> · <a href="creating.html">Creating .ndx</a> · <a href="nxmod.html">nxmod.toml</a> · <a href="profiles.html">Profiles</a> · <a href="cache.html">Cache</a> · <a href="cheats.html">Cheats</a> · <a href="gso.html">GSO/GSC</a> · <a href="repos.html">Repositories</a> · <a href="safety.html">Safety</a> · <a href="ai.html">AI Guide</a></p>
+
+    <hr>
+
+    <ol>
+      <li>Open Nx86.</li>
+      <li>Drag a mod archive or folder onto the Nx86 window.</li>
+      <li>Nx86 reads the Title ID from the manifest or folder structure. If it can't determine the game, it asks.</li>
+      <li>Nx86 validates the mod. Malformed or suspicious archives are rejected with no partial write.</li>
+      <li>Nx86 imports the mod into that game's cache folder and shows the rebuild cost.</li>
+      <li>Launch the game. Any required rebuild runs first and is cached for future launches.</li>
+    </ol>
+
+    <hr>
+
+    <h3>Supported formats</h3>
+    <table>
+      <tr><th>Format</th><th></th></tr>
+      <tr><td><code>folder</code></td><td>Directory dropped directly onto Nx86.</td></tr>
+      <tr><td><code>.ndx</code></td><td>Native Nx86 mod package. Preferred.</td></tr>
+      <tr><td><code>.zip</code></td><td></td></tr>
+      <tr><td><code>.7z</code></td><td></td></tr>
+      <tr><td><code>.rar</code></td><td></td></tr>
+      <tr><td><code>.tar</code></td><td></td></tr>
+      <tr><td><code>.tar.gz</code></td><td></td></tr>
+    </table>
+
+    <footer>nx86.dev &middot; <a href="https://github.com/nx86-emu">GitHub</a></footer>
+  </div>
+
+  <script src="../nav.js"></script>
+</body>
+</html>
