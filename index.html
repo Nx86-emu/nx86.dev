@@ -31,11 +31,9 @@
   <p class="subtitle">A work-in-progress Switch emulator focused on native recompilation.</p>
 
   <nav>
-    <a href="index.html">Index</a><span class="sep"></span>
+    <a href="index.html" aria-current="page">Index</a><span class="sep"></span>
     <a href="about.html">About</a><span class="sep"></span>
-    <a href="status.html">Status</a><span class="sep"></span>
-    <a href="technical.html">Technical Details</a><span class="sep"></span>
-    <a href="ndx/index.html">NDX</a><span class="sep"></span>
+    <a href="docs.html">Docs</a><span class="sep"></span>
     <a href="blog.html">Blog</a><span class="sep"></span>
     <a href="legal.html">Legal</a>
   </nav>
@@ -53,8 +51,11 @@
       <li>Full compiler pipeline: decode, lift, optimize, verify, lower, package</li>
       <li>Multi-block dispatcher with emergency JIT fallback</li>
       <li>Block chaining and fastmem for native-speed execution</li>
-      <li>215 differential tests across the full pipeline</li>
-      <li>GUI shell on Linux with Inspector</li>
+      <li>Self-modifying code detection, atomics v0, barrier semantics, and guest threading v0</li>
+      <li>Floating-point scalar and SIMD/NEON v0 in interpreter and evaluator</li>
+      <li>Advanced packed vector lowering, hot/cold splitting, and native coverage metrics</li>
+      <li>255 passing tests across the full pipeline</li>
+      <li>GUI shell on Linux with Inspector and Scheduler</li>
       <li>x86_64-v4 as the first target</li>
     </ul>
 

@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nx86 - Technical Details</title>
-  <meta name="description" content="How Nx86 works under the hood — the compiler pipeline, NxIR, memory model, and testing.">
+  <meta name="description" content="How Nx86 works under the hood: the compiler pipeline, NxIR, memory model, and testing.">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Nx86">
   <meta property="og:title" content="Nx86 - Technical Details">
-  <meta property="og:description" content="How Nx86 works under the hood — the compiler pipeline, NxIR, memory model, and testing.">
+  <meta property="og:description" content="How Nx86 works under the hood: the compiler pipeline, NxIR, memory model, and testing.">
   <meta property="og:url" content="https://nx86.dev/technical.html">
   <link rel="canonical" href="https://nx86.dev/technical.html">
   <meta name="theme-color" content="#0d1117">
@@ -24,23 +24,26 @@
   <nav>
     <a href="index.html">Index</a><span class="sep"></span>
     <a href="about.html">About</a><span class="sep"></span>
-    <a href="status.html">Status</a><span class="sep"></span>
-    <a href="technical.html">Technical Details</a><span class="sep"></span>
-    <a href="ndx/index.html">NDX</a><span class="sep"></span>
+    <a href="docs.html" aria-current="page">Docs</a><span class="sep"></span>
     <a href="blog.html">Blog</a><span class="sep"></span>
     <a href="legal.html">Legal</a>
   </nav>
 
   <div class="content">
     <h2>Technical Details</h2>
+    <nav class="subnav">
+      <a href="status.html">Status</a><span class="sep"></span>
+      <strong>Technical Details</strong><span class="sep"></span>
+      <a href="ndx/index.html">NDX</a>
+    </nav>
     <p>This page goes deeper into how Nx86 actually works. If you want the short version, check the <a href="about.html">About</a> page first.</p>
 
     <hr>
 
     <h2>The big picture</h2>
-    <p>The Nintendo Switch runs ARM64 (AArch64) code. A normal PC runs x86_64. These are completely different instruction sets, so you cannot just run Switch code directly on a PC &mdash; it has to be translated somehow.</p>
+    <p>The Nintendo Switch runs ARM64 (AArch64) code. A normal PC runs x86_64. These are completely different instruction sets, so you cannot just run Switch code directly on a PC, it has to be translated somehow.</p>
     <p>Most emulators do this translation at runtime with an interpreter or a JIT compiler. Nx86 takes a different approach: it translates as much ARM64 code as possible into native x86_64 machine code <em>before</em> you hit play. The result gets saved to disk so the next launch is faster. If the emulator hits code paths it has not seen before during gameplay, it compiles those on the fly and adds them to the cache for next time.</p>
-    <p>This is what the project calls <strong>Continuous Dynamic Compilation</strong> &mdash; the cache keeps getting smarter the more you play.</p>
+    <p>This is what the project calls <strong>Continuous Dynamic Compilation</strong>: the cache gets smarter the more you play.</p>
 
     <hr>
 
@@ -51,7 +54,7 @@
     <p>Raw ARM64 bytes get parsed into structured instruction objects. The decoder knows about arithmetic (ADD, SUB, AND, OR, XOR), moves (MOVZ), loads and stores (LDR, STR), branches (B, B.cond), comparisons (CMP, CMN), and supervisor calls (SVC). Each decoded instruction carries its address, raw bytes, what kind of instruction it is, and a human-readable disassembly string.</p>
 
     <h3>2. Lift to NxIR</h3>
-    <p>The decoded ARM64 instructions get converted into Nx86's own intermediate representation called NxIR. This is the central layer that everything else plugs into &mdash; both the ahead-of-time compiler and the emergency JIT produce NxIR before generating any native code.</p>
+    <p>The decoded ARM64 instructions get converted into Nx86's own intermediate representation called NxIR. This is the central layer that everything else plugs into, both the ahead-of-time compiler and the emergency JIT produce NxIR before generating any native code.</p>
     <p>The lifter also figures out where basic blocks begin and end by looking at branch targets and what comes after terminators. Guest register state carries across blocks through explicit GetReg/SetReg operations, which keeps things simple and avoids needing phi nodes.</p>
 
     <h3>3. Optimize</h3>
@@ -66,17 +69,17 @@
     <p>The code then goes through a hand-written x86_64 assembler that emits raw bytes with correct REX prefixes, ModR/M encoding, SIB bytes, and displacement handling. It supports labels with forward-reference fixups, so you can jump to a label that has not been emitted yet.</p>
 
     <h3>6. Package and store</h3>
-    <p>The finished native code gets packed into an <code>.nxo</code> file &mdash; a compact little-endian binary with a header (magic bytes, version, entry address, stack size), the code itself, and an FNV-1a content hash at the end for integrity checking. These files live in a managed cache directory.</p>
+    <p>The finished native code gets packed into an <code>.nxo</code> file, a compact little-endian binary with a header (magic bytes, version, entry address, stack size), the code itself, and an FNV-1a content hash at the end for integrity checking. These files live in a managed cache directory.</p>
 
     <hr>
 
     <h2>NxIR in more detail</h2>
     <p>NxIR is worth calling out because it is the thing the whole compiler revolves around. It is:</p>
     <ul>
-      <li><strong>Typed</strong> &mdash; values have explicit types like i1, i32, i64, or flags.</li>
-      <li><strong>SSA</strong> (Static Single Assignment) &mdash; every value is defined exactly once and referenced by index. No mutation, no ambiguity about where a value came from.</li>
-      <li><strong>Close to ARM64 semantics</strong> &mdash; it does not try to be a high-level IR. Operations map fairly directly to what ARM64 does, including explicit side effects.</li>
-      <li><strong>Serializable</strong> &mdash; functions can be round-tripped through JSON, which makes debugging and testing much easier.</li>
+      <li><strong>Typed</strong>, values have explicit types like i1, i32, i64, or flags.</li>
+      <li><strong>SSA</strong> (Static Single Assignment), every value is defined exactly once and referenced by index. No mutation, no ambiguity about where a value came from.</li>
+      <li><strong>Close to ARM64 semantics</strong>, it does not try to be a high-level IR. Operations map fairly directly to what ARM64 does, including explicit side effects.</li>
+      <li><strong>Serializable</strong>, functions can be round-tripped through JSON, which makes debugging and testing much easier.</li>
     </ul>
 
     <h3>Lazy flags</h3>
@@ -90,7 +93,7 @@
     <p>Nx86 includes a software page table that manages a 64 GiB virtual address space with 4 KiB pages. On Linux, this is backed by a real <code>mmap</code> reservation with no physical memory committed upfront (MAP_NORESERVE). Pages can be mapped with read, write, and execute permissions, and the system handles cross-page accesses and permission faults correctly.</p>
 
     <h3>W^X enforcement</h3>
-    <p>When native code needs to run, the JIT allocates memory pages, copies the code in while they are writable, then switches them to read+execute before any function pointer is created. This is the standard W^X (write XOR execute) policy &mdash; memory is never both writable and executable at the same time. It is a security measure borrowed from how modern operating systems handle code loading.</p>
+    <p>When native code needs to run, the JIT allocates memory pages, copies the code in while they are writable, then switches them to read+execute before any function pointer is created. This is the standard W^X (write XOR execute) policy: memory is never both writable and executable at the same time. It is a security measure borrowed from how modern operating systems handle code loading.</p>
 
     <h3>Guest CPU state</h3>
     <p>The emulator models the full AArch64 guest state: 31 general-purpose 64-bit registers, the stack pointer, the program counter, NZCV flags (stored as individual booleans), 32 128-bit floating-point/SIMD registers, and the floating-point control and status registers. The native code reads and writes this state through a pointer passed as the first argument to every generated function.</p>
@@ -100,13 +103,13 @@
     <h2>The cache system</h2>
     <p>Compiled native blocks get stored as <code>.nxo</code> files in a managed cache directory. The cache manager can scan the directory, validate files by checking their headers (cheap) or their full content hashes (thorough), insert new blocks, load existing ones, and clear everything out.</p>
     <p>Writes go to temporary files first and get moved into place atomically, so a crash mid-write will not corrupt an existing cached block.</p>
-    <p>On subsequent launches, previously compiled blocks are loaded directly from disk instead of being recompiled. This is the main thing that makes the "compile before play" approach practical &mdash; you pay the compilation cost once, not every time.</p>
+    <p>On subsequent launches, previously compiled blocks are loaded directly from disk instead of being recompiled. This is what makes the compile-before-play approach practical: you pay the cost once, not every session.</p>
 
     <hr>
 
     <h2>Block chaining</h2>
     <p>When the dispatcher finishes one native block, it normally looks up the next guest PC in the chain cache and jumps to the matching native block. That lookup is fast, but it is still a hash-table hit on every block exit. Block chaining eliminates that overhead for hot paths.</p>
-    <p>After two blocks execute back-to-back enough times, the runtime patches the exit of the first block to jump directly to the second. The patch site is a writable landing pad that gets flipped from a &ldquo;go to dispatcher&rdquo; stub to a &ldquo;go to next block&rdquo; jump. The whole thing respects W^X &mdash; the landing pad is writable during patching and read+execute afterward.</p>
+    <p>After two blocks execute back-to-back enough times, the runtime patches the exit of the first block to jump directly to the second. The patch site is a writable landing pad that gets flipped from a &ldquo;go to dispatcher&rdquo; stub to a &ldquo;go to next block&rdquo; jump. The whole thing respects W^X: the landing pad is writable during patching, then switched back to read+execute.</p>
     <p>If a cached block gets invalidated (for example, by self-modifying code in a future phase), all chains that point to it get torn down and the dispatcher path re-takes over until new chains form.</p>
 
     <hr>
@@ -114,23 +117,23 @@
     <h2>Fastmem and slowmem</h2>
     <p>Guest memory accesses go through one of two paths.</p>
     <p><strong>Fastmem</strong> is the fast path. The 64 GiB guest arena is mapped at a fixed base address, and the native code can compute a guest address and load or store directly through that base with no function call overhead. A bounds check against the arena size keeps things safe. If the address is in range and the page permissions allow it, the access completes in a handful of instructions.</p>
-    <p><strong>Slowmem</strong> is the fallback. When fastmem cannot handle an access &mdash; the page is not mapped, the permissions are wrong, or the access crosses a page boundary &mdash; the generated code calls into a runtime helper that does the full software page-table walk, reports faults, and logs the event. Every slowmem hit gets counted and written into the runtime profile, so the profile-guided rebuild can see which code paths are expensive and try to optimize them away next time.</p>
+    <p><strong>Slowmem</strong> is the fallback. When fastmem cannot handle an access (the page is not mapped, permissions are wrong, or the access crosses a page boundary), the generated code falls back to a runtime helper that does the full software page-table walk, reports faults, and logs the event. Every slowmem hit gets counted and written into the runtime profile, so the profile-guided rebuild can see which code paths are expensive and try to optimize them away next time.</p>
 
     <hr>
 
     <h2>Memory mirroring</h2>
-    <p>Some Switch titles map the same physical memory at multiple virtual addresses. Nx86 handles this by mirroring &mdash; multiple guest addresses resolve to the same underlying arena page. In release mode, mirrored accesses go through the fastmem path transparently. In debug mode, mirroring is disabled so that aliasing bugs surface as clean faults instead of silent corruption.</p>
+    <p>Some Switch titles map the same physical memory at multiple virtual addresses. Nx86 handles this through mirroring: multiple guest addresses resolve to the same underlying arena page. In release mode, mirrored accesses go through the fastmem path transparently. In debug mode, mirroring is disabled so that aliasing bugs surface as clean faults instead of silent corruption.</p>
 
     <hr>
 
     <h2>Guard and deopt metadata</h2>
     <p>NxIR supports a <code>Guard</code> terminator that checks a boolean condition at runtime. If the condition holds, execution continues to the normal successor block. If it fails, the runtime jumps to a deoptimization handler that can reconstruct the full guest CPU state from a metadata table.</p>
-    <p>Each function carries a deopt-point table that maps guard IDs to the register state that was live at that point. This is the foundation for future speculative optimization &mdash; the compiler can make optimistic assumptions, guard them, and fall back safely if the assumption turns out to be wrong.</p>
+    <p>Each function carries a deopt-point table that maps guard IDs to the register state that was live at that point. This is the foundation for future speculative optimization, the compiler can make optimistic assumptions, guard them, and fall back safely if the assumption turns out to be wrong.</p>
 
     <hr>
 
     <h2>Runtime profiling</h2>
-    <p>Every session produces a versioned JSONL profile file. Events include JIT block compilations, block-chaining decisions, slowmem hits, branch targets, and helper calls. The format is append-only and crash-safe &mdash; if the emulator crashes mid-session, the tail of the file can still be recovered and parsed.</p>
+    <p>Every session produces a versioned JSONL profile file. Events include JIT block compilations, block-chaining decisions, slowmem hits, branch targets, and helper calls. The format is append-only and crash-safe: if the emulator crashes mid-session, the tail of the file can still be recovered.</p>
     <p>The profile-guided rebuild reads these files to decide which JIT-compiled blocks should be promoted to ahead-of-time objects. Blocks that ran frequently enough get recompiled with full optimization and stored in the cache for the next launch.</p>
 
     <hr>
@@ -149,11 +152,11 @@
     <hr>
 
     <h2>Testing</h2>
-    <p>Nx86 uses three-way differential testing, which is a fancy way of saying the same program gets run three different ways and the results are compared against each other.</p>
+    <p>Nx86 uses three-way differential testing, which is a fancy way of saying the same program gets run three different ways and the results are compared against each other. There are currently 255 passing tests.</p>
     <ul>
-      <li><strong>Interpreter</strong> &mdash; a straightforward ARM64 interpreter that executes decoded instructions one at a time against guest memory. This is the ground truth.</li>
-      <li><strong>NxIR evaluator</strong> &mdash; an independent evaluator that runs the IR directly against guest memory. If this agrees with the interpreter, the lifting step is correct.</li>
-      <li><strong>Native execution</strong> &mdash; the actual x86_64 machine code generated by the compiler. If this also agrees, the full pipeline from ARM64 to native code is working.</li>
+      <li><strong>Interpreter</strong>, a straightforward ARM64 interpreter that executes decoded instructions one at a time against guest memory. This is the ground truth.</li>
+      <li><strong>NxIR evaluator</strong>, an independent evaluator that runs the IR directly against guest memory. If this agrees with the interpreter, the lifting step is correct.</li>
+      <li><strong>Native execution</strong>, the actual x86_64 machine code generated by the compiler. If this also agrees, the full pipeline from ARM64 to native code is working.</li>
     </ul>
     <p>All three must produce identical final register states and observable memory contents. If any of them disagree, something is wrong in the pipeline and the test fails.</p>
     <p>Test programs are defined as TOML files with hex-encoded ARM64 bytes, expected register values, expected memory ranges, and optional framebuffer specifications. These synthetic tests let the compiler be validated without needing real Switch software.</p>
@@ -161,14 +164,14 @@
     <hr>
 
     <h2>Current limits</h2>
-    <p>The decoder handles a subset of ARM64: arithmetic with immediates, logical operations with no shift, unconditional and conditional branches, basic loads and stores (unsigned immediate, 32-bit and 64-bit), moves, comparisons, and supervisor calls. That is enough for synthetic test programs but nowhere near enough for real Switch games yet.</p>
-    <p>The register allocator operates on single blocks with no cross-block awareness. There is no floating-point or SIMD support yet, no atomics or barrier semantics, and no guest threading. The GUI works on Linux with both Wayland and X11, but native code execution only runs on x86_64 Linux &mdash; other hosts get a clean "unsupported" message rather than a crash.</p>
+    <p>The decoder handles a subset of ARM64: arithmetic with immediates, logical operations with no shift, unconditional and conditional branches, basic loads and stores (unsigned immediate, 32-bit and 64-bit), moves, comparisons, supervisor calls, atomics (LDXR/STXR/LDAR/STLR), barriers (DMB/DSB/ISB), scalar FP (FMOV/FADD/FSUB/FMUL/FDIV/FCMP), and basic NEON (v.2d integer and FP add). That is enough for synthetic test programs but nowhere near enough for real Switch games yet.</p>
+    <p>The register allocator operates on single blocks with no cross-block awareness. Conditional branch lowering in native multi-block functions is not yet implemented. The GUI works on Linux with both Wayland and X11, but native code execution only runs on x86_64 Linux, other hosts get a clean "unsupported" message rather than a crash.</p>
     <p>The project is developed on Apple Silicon (aarch64-apple-darwin) but targets Linux x86_64-v4. The pure-logic parts (decoder, lifter, IR, verifier, tests) run on any platform. The native execution path is Linux-only for now.</p>
 
     <hr>
 
     <h2>The codebase</h2>
-    <p>Nx86 is a Rust workspace monorepo with 33 crates &mdash; 21 active, 11 skeleton placeholders, and 1 partial. Each crate covers a distinct part of the system. The project enforces strict code quality: <code>unsafe</code> usage, <code>unwrap()</code>, <code>todo!()</code>, and <code>dbg!()</code> are all treated as warnings, and CI runs clippy with <code>-D warnings</code> so they break the build. Any new <code>unsafe</code> block requires an explicit safety comment explaining why it is sound.</p>
+    <p>Nx86 is a Rust workspace monorepo with 32 crates. Each crate covers a distinct part of the system. The project enforces strict code quality: <code>unsafe</code> usage, <code>unwrap()</code>, <code>todo!()</code>, and <code>dbg!()</code> are all treated as warnings, and CI runs clippy with <code>-D warnings</code> so they break the build. Any new <code>unsafe</code> block requires an explicit safety comment explaining why it is sound.</p>
 
     <footer>nx86.dev &middot; <a href="https://github.com/nx86-emu">GitHub</a></footer>
   </div>

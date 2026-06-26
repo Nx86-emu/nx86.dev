@@ -43,14 +43,25 @@ nav {
   margin-bottom: 28px;
 }
 nav a {
-  color: var(--muted);
+  color: var(--fg);
   text-decoration: none;
   font-size: 0.95rem;
 }
-nav a:visited { color: var(--muted); }
-nav a:hover { color: var(--fg); }
+nav a:visited { color: var(--fg); }
+nav a:hover { color: var(--accent); }
+nav a[aria-current="page"] { color: var(--muted); }
 nav span.sep { color: var(--muted); margin: 0 2px; }
 nav span.sep::before { content: " | "; }
+.subnav {
+  text-align: center;
+  margin-bottom: 16px;
+  font-size: 0.9rem;
+}
+.subnav a { color: var(--muted); text-decoration: none; }
+.subnav a:visited { color: var(--muted); }
+.subnav a:hover { color: var(--fg); }
+.subnav strong { color: var(--fg); font-weight: 500; }
+.subnav span.sep { color: var(--muted); margin: 0 2px; }
 .content {
   margin-left: auto;
   margin-right: auto;
@@ -99,3 +110,18 @@ footer {
   font-size: 0.85rem;
   text-align: center;
 }
+.copy-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 14px;
+  border: 1px solid var(--muted);
+  background: transparent;
+  color: var(--fg);
+  font-size: 0.9rem;
+  cursor: pointer;
+  font-family: inherit;
+  margin: 10px 0;
+}
+.copy-btn:hover { border-color: var(--fg); }
+.copy-btn svg { width: 14px; height: 14px; flex-shrink: 0; }

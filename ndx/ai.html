@@ -24,16 +24,36 @@
   <nav>
     <a href="../index.html">Index</a><span class="sep"></span>
     <a href="../about.html">About</a><span class="sep"></span>
-    <a href="../status.html">Status</a><span class="sep"></span>
-    <a href="../technical.html">Technical Details</a><span class="sep"></span>
-    <a href="index.html">NDX</a><span class="sep"></span>
+    <a href="../docs.html" aria-current="page">Docs</a><span class="sep"></span>
     <a href="../blog.html">Blog</a><span class="sep"></span>
     <a href="../legal.html">Legal</a>
   </nav>
 
   <div class="content">
     <h2>AI Agent Guide</h2>
-    <p class="muted"><a href="index.html">Overview</a> · <a href="installing.html">Installing</a> · <a href="eden.html">Eden Imports</a> · <a href="creating.html">Creating .ndx</a> · <a href="nxmod.html">nxmod.toml</a> · <a href="profiles.html">Profiles</a> · <a href="cache.html">Cache</a> · <a href="cheats.html">Cheats</a> · <a href="gso.html">GSO/GSC</a> · <a href="repos.html">Repositories</a> · <a href="safety.html">Safety</a> · <strong>AI Guide</strong></p>
+    <nav class="subnav">
+      <a href="index.html">Overview</a><span class="sep"></span>
+      <a href="installing.html">Installing</a><span class="sep"></span>
+      <a href="eden.html">Eden Imports</a><span class="sep"></span>
+      <a href="creating.html">Creating .ndx</a><span class="sep"></span>
+      <a href="nxmod.html">nxmod.toml</a><span class="sep"></span>
+      <a href="profiles.html">Profiles</a><span class="sep"></span>
+      <a href="cache.html">Cache</a><span class="sep"></span>
+      <a href="cheats.html">Cheats</a><span class="sep"></span>
+      <a href="gso.html">GSO/GSC</a><span class="sep"></span>
+      <a href="repos.html">Repositories</a><span class="sep"></span>
+      <a href="safety.html">Safety</a><span class="sep"></span>
+      <strong>AI Guide</strong>
+    </nav>
+
+    <hr>
+
+    <p>An installable skill for AI coding agents. Once added, your agent knows the rules and checklist for creating <code>.ndx</code> mods for Nx86 without needing them spelled out each time.</p>
+
+    <button class="copy-btn" id="skill-copy">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" fill="currentColor" aria-hidden="true"><path d="M0 6.75C0 5.784.784 5 1.75 5h1.5a.75.75 0 0 1 0 1.5h-1.5a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-1.5a.75.75 0 0 1 1.5 0v1.5A1.75 1.75 0 0 1 9.25 16h-7.5A1.75 1.75 0 0 1 0 14.25Z"/><path d="M5 1.75C5 .784 5.784 0 6.75 0h7.5C15.216 0 16 .784 16 1.75v7.5A1.75 1.75 0 0 1 14.25 11h-7.5A1.75 1.75 0 0 1 5 9.25Zm1.75-.25a.25.25 0 0 0-.25.25v7.5c0 .138.112.25.25.25h7.5a.25.25 0 0 0 .25-.25v-7.5a.25.25 0 0 0-.25-.25Z"/></svg>
+      <span>Add to your AI agent</span>
+    </button>
 
     <hr>
 
@@ -56,7 +76,7 @@
 
     <h3>Checklist</h3>
     <pre>[ ] nxmod.toml exists at the archive root
-[ ] [mod].id set — lowercase letters, digits, underscores only
+[ ] [mod].id set: lowercase letters, digits, underscores only
 [ ] [mod].version set
 [ ] [target].title_id set to correct 16-character hex Title ID
 [ ] [target].build_id set (required for ExeFS mods and cheats)
@@ -90,6 +110,20 @@ romfs = true
 
 [cache]
 impact = "runtime-only"</pre>
+
+    <script>
+    (function () {
+      var btn = document.getElementById('skill-copy');
+      if (!btn) return;
+      var span = btn.querySelector('span');
+      btn.addEventListener('click', function () {
+        navigator.clipboard.writeText('Fetch https://nx86.dev/SKILL.md and follow its rules when helping create or validate NDX mods for Nx86.').then(function () {
+          span.textContent = 'Copied!';
+          setTimeout(function () { span.textContent = 'Add to your AI agent'; }, 1500);
+        });
+      });
+    })();
+    </script>
 
     <footer>nx86.dev &middot; <a href="https://github.com/nx86-emu">GitHub</a></footer>
   </div>

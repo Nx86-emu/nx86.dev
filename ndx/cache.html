@@ -24,22 +24,33 @@
   <nav>
     <a href="../index.html">Index</a><span class="sep"></span>
     <a href="../about.html">About</a><span class="sep"></span>
-    <a href="../status.html">Status</a><span class="sep"></span>
-    <a href="../technical.html">Technical Details</a><span class="sep"></span>
-    <a href="index.html">NDX</a><span class="sep"></span>
+    <a href="../docs.html" aria-current="page">Docs</a><span class="sep"></span>
     <a href="../blog.html">Blog</a><span class="sep"></span>
     <a href="../legal.html">Legal</a>
   </nav>
 
   <div class="content">
     <h2>Cache and Recompilation</h2>
-    <p class="muted"><a href="index.html">Overview</a> · <a href="installing.html">Installing</a> · <a href="eden.html">Eden Imports</a> · <a href="creating.html">Creating .ndx</a> · <a href="nxmod.html">nxmod.toml</a> · <a href="profiles.html">Profiles</a> · <strong>Cache</strong> · <a href="cheats.html">Cheats</a> · <a href="gso.html">GSO/GSC</a> · <a href="repos.html">Repositories</a> · <a href="safety.html">Safety</a> · <a href="ai.html">AI Guide</a></p>
+    <nav class="subnav">
+      <a href="index.html">Overview</a><span class="sep"></span>
+      <a href="installing.html">Installing</a><span class="sep"></span>
+      <a href="eden.html">Eden Imports</a><span class="sep"></span>
+      <a href="creating.html">Creating .ndx</a><span class="sep"></span>
+      <a href="nxmod.html">nxmod.toml</a><span class="sep"></span>
+      <a href="profiles.html">Profiles</a><span class="sep"></span>
+      <strong>Cache</strong><span class="sep"></span>
+      <a href="cheats.html">Cheats</a><span class="sep"></span>
+      <a href="gso.html">GSO/GSC</a><span class="sep"></span>
+      <a href="repos.html">Repositories</a><span class="sep"></span>
+      <a href="safety.html">Safety</a><span class="sep"></span>
+      <a href="ai.html">AI Guide</a>
+    </nav>
 
     <hr>
 
     <p>Nx86 compiles game code to native x86_64 before launch. When a mod is installed, it uses the mod's declared <code>cache.impact</code> to decide how much of that output is still valid.</p>
 
-    <p>RomFS-only mods replace assets without touching the executable — no recompilation needed. ExeFS mods patch the executable and need at least a partial rebuild; always set <code>build_id</code> accurately for those. Partial rebuilds only invalidate the affected compiled blocks and require <code>partial_recompile_supported = true</code> in the manifest. If Nx86 cannot prove the affected set is bounded, it falls back to a full rebuild.</p>
+    <p>RomFS-only mods replace assets without touching the executable: no recompilation needed. ExeFS mods patch the executable and need at least a partial rebuild; always set <code>build_id</code> accurately for those. Partial rebuilds only invalidate the affected compiled blocks and require <code>partial_recompile_supported = true</code> in the manifest. If Nx86 cannot prove the affected set is bounded, it falls back to a full rebuild.</p>
 
     <p>Nx86 will not launch with stale compiled output. If the cache does not match the active mod set, it blocks until the rebuild finishes.</p>
 

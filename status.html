@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nx86 - Status</title>
-  <meta name="description" content="Current state of the Nx86 emulator project — what works and what does not.">
+  <meta name="description" content="Current state of the Nx86 emulator project: what works and what does not.">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Nx86">
   <meta property="og:title" content="Nx86 - Status">
-  <meta property="og:description" content="Current state of the Nx86 emulator project — what works and what does not.">
+  <meta property="og:description" content="Current state of the Nx86 emulator project: what works and what does not.">
   <meta property="og:url" content="https://nx86.dev/status.html">
   <link rel="canonical" href="https://nx86.dev/status.html">
   <meta name="theme-color" content="#0d1117">
@@ -24,16 +24,19 @@
   <nav>
     <a href="index.html">Index</a><span class="sep"></span>
     <a href="about.html">About</a><span class="sep"></span>
-    <a href="status.html">Status</a><span class="sep"></span>
-    <a href="technical.html">Technical Details</a><span class="sep"></span>
-    <a href="ndx/index.html">NDX</a><span class="sep"></span>
+    <a href="docs.html" aria-current="page">Docs</a><span class="sep"></span>
     <a href="blog.html">Blog</a><span class="sep"></span>
     <a href="legal.html">Legal</a>
   </nav>
 
   <div class="content">
     <h2>Status</h2>
-    <p>Nx86 has completed 33 development phases (Phase 0 through Phase 32). The compiler pipeline, runtime, memory system, and GUI shell are all functional. The project cannot run real Switch games yet.</p>
+    <nav class="subnav">
+      <strong>Status</strong><span class="sep"></span>
+      <a href="technical.html">Technical Details</a><span class="sep"></span>
+      <a href="ndx/index.html">NDX</a>
+    </nav>
+    <p>Nx86 has completed 44 development phases (Phase 0 through Phase 43). The compiler pipeline, runtime, memory system, threading skeleton, FP and SIMD support, and GUI shell are all functional. The project cannot run real Switch games yet.</p>
 
     <hr>
 
@@ -43,18 +46,27 @@
       <li>NxIR exists as a typed SSA intermediate representation with a verifier and dead-flag elimination.</li>
       <li>Multi-block native execution through a dispatcher with guest PC lookup and block exit handling.</li>
       <li>Emergency JIT compiles missing blocks on the fly and adds them to the cache.</li>
-      <li>Block chaining with guarded native exits and W^X patching (feature-gated).</li>
+      <li>Block chaining with guarded native exits and W^X patching.</li>
       <li>Fastmem: direct guest memory access through a 64 GiB mmap arena with checked fallback.</li>
       <li>Slowmem: fallback load/store helpers with counters, fault reporting, and coverage penalties.</li>
       <li>Memory mirroring with release/debug mode support.</li>
+      <li>Self-modifying code detection: page generation tracking, SIGSEGV signal handler (Linux), dispatcher eviction, and page re-protection.</li>
+      <li>Atomics v0: exclusive monitor, LDXR/STXR decode and execution, LDAR/STLR acquire/release semantics.</li>
+      <li>Barrier semantics v0: DMB, DSB, and ISB decode, lift into NxIR, and interpreter/evaluator execution.</li>
+      <li>Guest threading v0: thread state isolation, scheduler with host-thread and fiber modes, and bounded replay logs.</li>
+      <li>Floating-point scalar: FMOV, FADD, FSUB, FMUL, FDIV, FCMP over f64 in interpreter and evaluator.</li>
+      <li>SIMD/NEON v0: 128-bit vector registers, v.2d integer and FP add through interpreter, evaluator, and native backend.</li>
+      <li>Advanced vector lowering: packed XMM native ops (paddq, addpd, pcmpeqq, pshufd) with AVX-512 mask support.</li>
+      <li>Hot/cold block splitting: profile-guided native block layout without changing dispatcher keys.</li>
+      <li>Native coverage system: functional, static, executed, fastmem, and slowmem penalty metrics in the GUI.</li>
       <li>Guard and deopt metadata for future speculative optimization.</li>
       <li>Cache manager with .nxo integrity checking, manifest, and atomic writes.</li>
       <li>Runtime profiling: versioned JSONL profiles with typed events, crash-tail recovery, and file locking.</li>
       <li>Profile-guided rebuild promotes JIT-discovered blocks to AOT objects.</li>
       <li>CFG recovery via recursive-descent traversal.</li>
       <li>Inspector with disassembly, CFG, NxIR dump, and native mapping views.</li>
-      <li>GUI shell with Library, Compile, Tests, Settings, and Inspector screens (egui, Linux).</li>
-      <li>215 differential tests — interpreter, NxIR evaluator, and native execution must all agree.</li>
+      <li>GUI shell with Library, Compile, Tests, Settings, Inspector, and Scheduler screens (egui, Linux).</li>
+      <li>255 passing tests: interpreter, NxIR evaluator, and native execution must all agree.</li>
     </ul>
 
     <hr>
@@ -65,10 +77,7 @@
       <li>No game import or title boot.</li>
       <li>No firmware, keys, or bundled system files.</li>
       <li>No homebrew execution yet.</li>
-      <li>No floating-point or SIMD/NEON support.</li>
       <li>No conditional branch lowering in native multi-block functions.</li>
-      <li>No atomics or barrier semantics.</li>
-      <li>No guest threading.</li>
       <li>No Vulkan rendering or shader translation.</li>
       <li>No Windows or macOS native execution.</li>
     </ul>
@@ -77,10 +86,8 @@
 
     <h2>Next</h2>
     <ul>
-      <li>Phase 33: Self-Modifying Code Support — executable page write detection, object and chain invalidation.</li>
-      <li>Phase 34: Atomics v0 — exclusive monitor model, LDXR/STXR subset, acquire/release.</li>
-      <li>Phase 35: Barrier Semantics v0 — DMB/DSB/ISB subset.</li>
-      <li>Phase 36: Guest Threading v0 — thread state isolation, scheduler skeleton.</li>
+      <li>Phase 44: Homebrew Loader v0: load simple homebrew, basic module metadata, entrypoint handling, minimal services.</li>
+      <li>Phase 45: HLE/Service Skeleton: service call dispatch, filesystem, thread, memory, and input service skeletons.</li>
     </ul>
 
     <footer>nx86.dev &middot; <a href="https://github.com/nx86-emu">GitHub</a></footer>

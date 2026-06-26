@@ -4,12 +4,12 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Nx86 - NDX: Safety and Trust</title>
-  <meta name="description" content="Safety and trust model for Nx86 NDX mods — what Nx86 does not ship and what it rejects.">
+  <meta name="description" content="Safety and trust model for Nx86 NDX mods: what Nx86 does not ship and what it rejects.">
   <meta name="robots" content="index, follow">
   <meta property="og:type" content="website">
   <meta property="og:site_name" content="Nx86">
   <meta property="og:title" content="Nx86 - NDX: Safety and Trust">
-  <meta property="og:description" content="Safety and trust model for Nx86 NDX mods — what Nx86 does not ship and what it rejects.">
+  <meta property="og:description" content="Safety and trust model for Nx86 NDX mods: what Nx86 does not ship and what it rejects.">
   <meta property="og:url" content="https://nx86.dev/ndx/safety.html">
   <link rel="canonical" href="https://nx86.dev/ndx/safety.html">
   <meta name="theme-color" content="#0d1117">
@@ -24,16 +24,27 @@
   <nav>
     <a href="../index.html">Index</a><span class="sep"></span>
     <a href="../about.html">About</a><span class="sep"></span>
-    <a href="../status.html">Status</a><span class="sep"></span>
-    <a href="../technical.html">Technical Details</a><span class="sep"></span>
-    <a href="index.html">NDX</a><span class="sep"></span>
+    <a href="../docs.html" aria-current="page">Docs</a><span class="sep"></span>
     <a href="../blog.html">Blog</a><span class="sep"></span>
     <a href="../legal.html">Legal</a>
   </nav>
 
   <div class="content">
     <h2>Safety and Trust</h2>
-    <p class="muted"><a href="index.html">Overview</a> · <a href="installing.html">Installing</a> · <a href="eden.html">Eden Imports</a> · <a href="creating.html">Creating .ndx</a> · <a href="nxmod.html">nxmod.toml</a> · <a href="profiles.html">Profiles</a> · <a href="cache.html">Cache</a> · <a href="cheats.html">Cheats</a> · <a href="gso.html">GSO/GSC</a> · <a href="repos.html">Repositories</a> · <strong>Safety</strong> · <a href="ai.html">AI Guide</a></p>
+    <nav class="subnav">
+      <a href="index.html">Overview</a><span class="sep"></span>
+      <a href="installing.html">Installing</a><span class="sep"></span>
+      <a href="eden.html">Eden Imports</a><span class="sep"></span>
+      <a href="creating.html">Creating .ndx</a><span class="sep"></span>
+      <a href="nxmod.html">nxmod.toml</a><span class="sep"></span>
+      <a href="profiles.html">Profiles</a><span class="sep"></span>
+      <a href="cache.html">Cache</a><span class="sep"></span>
+      <a href="cheats.html">Cheats</a><span class="sep"></span>
+      <a href="gso.html">GSO/GSC</a><span class="sep"></span>
+      <a href="repos.html">Repositories</a><span class="sep"></span>
+      <strong>Safety</strong><span class="sep"></span>
+      <a href="ai.html">AI Guide</a>
+    </nav>
 
     <hr>
 
@@ -55,7 +66,7 @@
     <hr>
 
     <h3>Native and Lua modules</h3>
-    <p>Mods with compiled native modules or Lua scripts require explicit user trust. Native modules run inside the Nx86 process with the same access level as Nx86 itself — treat them like running arbitrary code. The mod must declare <code>[content].native = true</code> and <code>[security].requires_native_code = true</code>; Nx86 shows a trust prompt at import.</p>
+    <p>Mods with compiled native modules or Lua scripts require explicit user trust. Native modules run inside the Nx86 process with the same access level as Nx86 itself: treat them like running arbitrary code. The mod must declare <code>[content].native = true</code> and <code>[security].requires_native_code = true</code>; Nx86 shows a trust prompt at import.</p>
 
     <footer>nx86.dev &middot; <a href="https://github.com/nx86-emu">GitHub</a></footer>
   </div>

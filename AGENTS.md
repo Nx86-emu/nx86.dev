@@ -9,6 +9,7 @@ Static HTML website for **nx86.dev** — a Switch emulator project focused on na
 ```
 index.html          Home page
 about.html          What Nx86 is and why it exists
+docs.html           Documentation hub — links to Status, Technical Details, NDX
 status.html         Current project status (now / not yet / next)
 technical.html      Deep technical details (compiler pipeline, NxIR, memory, testing)
 ndx/index.html      NDX modloader overview and section index
@@ -65,9 +66,7 @@ Every page (except 404) follows this exact boilerplate:
   <nav>
     <a href="index.html">Index</a><span class="sep"></span>
     <a href="about.html">About</a><span class="sep"></span>
-    <a href="status.html">Status</a><span class="sep"></span>
-    <a href="technical.html">Technical Details</a><span class="sep"></span>
-    <a href="ndx/index.html">NDX</a><span class="sep"></span>
+    <a href="docs.html">Docs</a><span class="sep"></span>
     <a href="blog.html">Blog</a><span class="sep"></span>
     <a href="legal.html">Legal</a>
   </nav>
@@ -85,8 +84,10 @@ Every page (except 404) follows this exact boilerplate:
 
 Rules:
 - The logo, subtitle, and nav are **duplicated in every HTML file** — they are not injected by JS.
-- The nav link order is always: Index, About, Status, Technical Details, NDX, Blog, Legal.
+- The nav link order is always: Index, About, Docs, Blog, Legal.
 - Separators are `<span class="sep"></span>` (CSS renders ` | ` via `::before`).
+- The current page's nav link must have `aria-current="page"` — this makes it muted/gray via CSS. For all Docs-section pages (`status.html`, `technical.html`, `ndx/*.html`), the Docs link gets `aria-current="page"`.
+- `status.html` and `technical.html` each have a `<nav class="subnav">` showing Status | Technical Details | NDX, with the current page as `<strong>` instead of a link.
 - The footer is inside `.content` and always reads: `nx86.dev · GitHub`.
 - `nav.js` is loaded at the bottom of `<body>`, after `.content`.
 - 404.html has `<meta name="robots" content="noindex">` and no footer link to GitHub (just the standard footer).
@@ -110,7 +111,7 @@ Rules:
 - `.muted` for secondary text, `.pipeline` for monospaced pipeline strings.
 - `code` — inline monospace. `pre` — block code with `var(--accent-bg)` background; defined in style.css.
 - NDX sub-pages live in `ndx/` and use `../` to reference root assets (`../style.css`, `../logo.svg`, `../nav.js`, `../favicon.svg`) and root pages (`../about.html`, etc.). The NDX nav link within `ndx/` pages is `index.html` (no prefix). Cross-links between NDX pages are relative with no prefix.
-- NDX sub-pages use a `<p class="muted">` secondary nav at the top of `.content`, listing all 12 NDX pages with the current page bolded rather than linked.
+- NDX sub-pages use a `<nav class="subnav">` secondary nav at the top of `.content`, listing all 12 NDX pages with `<span class="sep"></span>` separators. The current page is `<strong>` rather than a link.
 - `hr` for section dividers inside `.content`.
 - Body padding: `6px 50px`.
 - No external fonts — `sans-serif` system font stack.
