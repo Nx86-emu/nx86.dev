@@ -30,15 +30,11 @@
   </nav>
 
   <div class="content">
-    <h2>Technical Details</h2>
     <nav class="subnav">
       <a href="status.html">Status</a><span class="sep"></span>
       <strong>Technical Details</strong><span class="sep"></span>
       <a href="ndx/index.html">NDX</a>
     </nav>
-    <p>This page goes deeper into how Nx86 actually works. If you want the short version, check the <a href="about.html">About</a> page first.</p>
-
-    <hr>
 
     <h2>The big picture</h2>
     <p>The Nintendo Switch runs ARM64 (AArch64) code. A normal PC runs x86_64. These are completely different instruction sets, so you cannot just run Switch code directly on a PC, it has to be translated somehow.</p>
@@ -51,7 +47,7 @@
     <p>When Nx86 compiles a piece of ARM64 code, it goes through a chain of stages. Each stage has one job and passes its output to the next one.</p>
 
     <h3>1. Decode</h3>
-    <p>Raw ARM64 bytes get parsed into structured instruction objects. The decoder knows about arithmetic (ADD, SUB, AND, OR, XOR), moves (MOVZ), loads and stores (LDR, STR), branches (B, B.cond), comparisons (CMP, CMN), and supervisor calls (SVC). Each decoded instruction carries its address, raw bytes, what kind of instruction it is, and a human-readable disassembly string.</p>
+    <p>Raw ARM64 bytes get parsed into structured instruction objects. The decoder knows about arithmetic (ADD, SUB, AND, OR, XOR), moves (MOVZ), loads and stores (LDR, STR), branches (B, B.cond), comparisons (CMP, CMN), supervisor calls (SVC), atomics, barriers, scalar FP, and basic NEON operations. Each decoded instruction carries its address, raw bytes, what kind of instruction it is, and a human-readable disassembly string.</p>
 
     <h3>2. Lift to NxIR</h3>
     <p>The decoded ARM64 instructions get converted into Nx86's own intermediate representation called NxIR. This is the central layer that everything else plugs into, both the ahead-of-time compiler and the emergency JIT produce NxIR before generating any native code.</p>
@@ -97,6 +93,26 @@
 
     <h3>Guest CPU state</h3>
     <p>The emulator models the full AArch64 guest state: 31 general-purpose 64-bit registers, the stack pointer, the program counter, NZCV flags (stored as individual booleans), 32 128-bit floating-point/SIMD registers, and the floating-point control and status registers. The native code reads and writes this state through a pointer passed as the first argument to every generated function.</p>
+
+    <hr>
+
+    <h2>Homebrew and services</h2>
+    <p>Nx86 now has a simple homebrew path, but it is deliberately not a real Switch loader yet. It reads an Nx86-owned <code>.nxhb.toml</code> descriptor, maps declared code, data, and stack ranges into guest memory, starts at the descriptor entrypoint, and classifies minimal SVC exits.</p>
+    <p>The HLE layer exposes deterministic skeleton services for the current homebrew path. The service boundary covers clean exit, filesystem success stubs, synthetic thread and memory responses, and a homebrew-visible input request. This proves the runtime/service split without claiming Horizon ABI coverage.</p>
+
+    <hr>
+
+    <h2>Input, IPC, and audio</h2>
+    <p>The input runtime stores stable button bits, keyboard mappings, gamepad mappings, and injected test snapshots. Homebrew can receive a packed controller state through the current input service path.</p>
+    <p>Guest IPC v0 is a clean-room service command format for Nx86 tests and prototypes. It includes service names, sessions, domains, object handles, result codes, handle transfers, buffer descriptors, and binary command/response buffers. The current audio path uses that IPC layer to queue interleaved stereo <code>f32</code> PCM into an audio runtime skeleton.</p>
+
+    <hr>
+
+    <h2>Graphics and shader skeletons</h2>
+    <p>The Vulkan backend skeleton loads Vulkan through <code>ash</code>, detects whether a usable device is available, creates a graphics device where possible, and can render an offscreen frame. The GUI can surface the rendered-frame path.</p>
+    <p>The shader translation skeleton models shader stages, source hashes, metadata, deterministic placeholder translation output, and <code>.nxshader</code> cache objects. It is not a real shader compiler yet: it does not generate SPIR-V or translate Maxwell/NVN binaries.</p>
+    <p>Shader AOT compiles a title's whole shader set during initial compile. Each shader gets translated (currently a placeholder), cached as a <code>.nxshader</code> object, and the pass reports readiness in basis points. Shared profile hints steer compilation order so hot shaders compile first. Shader readiness is one axis of the Native Coverage min-gate alongside CPU readiness.</p>
+    <p>The pipeline cache infrastructure wraps Vulkan's <code>VkPipelineCache</code> with save/load persistence. <code>PipelineCacheBlob</code> persists opaque pipeline cache bytes to disk with atomic writes. <code>PipelineKey</code> is a deterministic FNV-1a hash of shader combination plus render state. A <code>PipelineMissLog</code> records cache misses at runtime. Pipeline readiness is the third axis of the Native Coverage min-gate.</p>
 
     <hr>
 
@@ -147,12 +163,12 @@
       <li>Next time you launch the same game, that block is already in the cache. The JIT path gets shorter every session.</li>
     </ol>
     <p>The emergency JIT uses the exact same compiler pipeline as the ahead-of-time path. It just prioritizes speed over optimization depth. Blocks it discovers get persisted for reuse, so the cache gradually fills in the gaps.</p>
-    <p>The main metric for tracking progress is called <strong>Native Coverage</strong>. It measures how much of a game's code has been translated to native output, not just how many bytes have been compiled. The bands are: Terrible (0&ndash;60%), Poor (60&ndash;90%), Great (90&ndash;98%), Excellent (98&ndash;100%), and Perfect (100%).</p>
+    <p>The main metric for tracking progress is called <strong>Native Coverage</strong>. It combines three axes &mdash; CPU readiness, shader readiness, and pipeline readiness &mdash; using a min-gate, so the weakest axis caps the combined number. Each axis reports in basis points. The bands are: Terrible (0&ndash;60%), Poor (60&ndash;90%), Great (90&ndash;98%), Excellent (98&ndash;100%), and Perfect (100%).</p>
 
     <hr>
 
     <h2>Testing</h2>
-    <p>Nx86 uses three-way differential testing, which is a fancy way of saying the same program gets run three different ways and the results are compared against each other. There are currently 255 passing tests.</p>
+    <p>Nx86 uses three-way differential testing, which is a fancy way of saying the same program gets run three different ways and the results are compared against each other. The current local workspace passes 343 unit tests.</p>
     <ul>
       <li><strong>Interpreter</strong>, a straightforward ARM64 interpreter that executes decoded instructions one at a time against guest memory. This is the ground truth.</li>
       <li><strong>NxIR evaluator</strong>, an independent evaluator that runs the IR directly against guest memory. If this agrees with the interpreter, the lifting step is correct.</li>
@@ -164,14 +180,15 @@
     <hr>
 
     <h2>Current limits</h2>
-    <p>The decoder handles a subset of ARM64: arithmetic with immediates, logical operations with no shift, unconditional and conditional branches, basic loads and stores (unsigned immediate, 32-bit and 64-bit), moves, comparisons, supervisor calls, atomics (LDXR/STXR/LDAR/STLR), barriers (DMB/DSB/ISB), scalar FP (FMOV/FADD/FSUB/FMUL/FDIV/FCMP), and basic NEON (v.2d integer and FP add). That is enough for synthetic test programs but nowhere near enough for real Switch games yet.</p>
+    <p>The decoder handles enough ARM64 for synthetic tests and the simple Nx86 homebrew path, but not enough for commercial title boot. Real NRO/NSO parsing, Horizon ABI coverage, broad service behavior, real shader translation, and title compatibility work are still later phases.</p>
     <p>The register allocator operates on single blocks with no cross-block awareness. Conditional branch lowering in native multi-block functions is not yet implemented. The GUI works on Linux with both Wayland and X11, but native code execution only runs on x86_64 Linux, other hosts get a clean "unsupported" message rather than a crash.</p>
+    <p>The graphics stack has shader AOT, pipeline cache infrastructure, and a three-axis Native Coverage min-gate. Vulkan can be detected and used for a test frame where a device exists. Real SPIR-V generation, Maxwell/NVN shader translation, runtime pipeline creation, and graphics profile feedback are not implemented yet.</p>
     <p>The project is developed on Apple Silicon (aarch64-apple-darwin) but targets Linux x86_64-v4. The pure-logic parts (decoder, lifter, IR, verifier, tests) run on any platform. The native execution path is Linux-only for now.</p>
 
     <hr>
 
     <h2>The codebase</h2>
-    <p>Nx86 is a Rust workspace monorepo with 32 crates. Each crate covers a distinct part of the system. The project enforces strict code quality: <code>unsafe</code> usage, <code>unwrap()</code>, <code>todo!()</code>, and <code>dbg!()</code> are all treated as warnings, and CI runs clippy with <code>-D warnings</code> so they break the build. Any new <code>unsafe</code> block requires an explicit safety comment explaining why it is sound.</p>
+    <p>Nx86 is a Rust workspace monorepo with 33 crates. Each crate covers a distinct part of the system. The project enforces strict code quality: <code>unsafe</code> usage, <code>unwrap()</code>, <code>todo!()</code>, and <code>dbg!()</code> are all treated as warnings, and CI runs clippy with <code>-D warnings</code> so they break the build. Any new <code>unsafe</code> block requires an explicit safety comment explaining why it is sound.</p>
 
     <footer>nx86.dev &middot; <a href="https://github.com/nx86-emu">GitHub</a></footer>
   </div>

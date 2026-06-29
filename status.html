@@ -36,37 +36,61 @@
       <a href="technical.html">Technical Details</a><span class="sep"></span>
       <a href="ndx/index.html">NDX</a>
     </nav>
-    <p>Nx86 has completed 44 development phases (Phase 0 through Phase 43). The compiler pipeline, runtime, memory system, threading skeleton, FP and SIMD support, and GUI shell are all functional. The project cannot run real Switch games yet.</p>
+    <p>Nx86 has 52 development phases present locally (Phase 0 through Phase 51). The compiler pipeline, runtime, memory system, threading skeleton, FP and SIMD support, simple homebrew path, HLE service skeletons, input runtime, guest IPC/audio skeleton, Vulkan backend skeleton, shader translation skeleton, shader AOT, pipeline cache infrastructure, and GUI shell are in place. The project cannot run real Switch games yet.</p>
 
     <hr>
 
     <h2>Now</h2>
+
+    <h3>Pipeline and native runtime</h3>
     <ul>
-      <li>Synthetic ARM64 programs travel the full compiler pipeline: decode, lift to NxIR, optimize, verify, lower to x86_64, package as .nxo.</li>
+      <li>Synthetic ARM64 programs travel the full compiler pipeline: decode, lift to NxIR, optimize, verify, lower to x86_64-v4, package as .nxo.</li>
       <li>NxIR exists as a typed SSA intermediate representation with a verifier and dead-flag elimination.</li>
       <li>Multi-block native execution through a dispatcher with guest PC lookup and block exit handling.</li>
       <li>Emergency JIT compiles missing blocks on the fly and adds them to the cache.</li>
       <li>Block chaining with guarded native exits and W^X patching.</li>
+      <li>Hot/cold block splitting: profile-guided native block layout without changing dispatcher keys.</li>
+      <li>Native coverage reports functional, static, executed, fastmem, and slowmem penalty metrics in the GUI.</li>
+    </ul>
+
+    <h3>Memory, CPU features, and threading</h3>
+    <ul>
       <li>Fastmem: direct guest memory access through a 64 GiB mmap arena with checked fallback.</li>
       <li>Slowmem: fallback load/store helpers with counters, fault reporting, and coverage penalties.</li>
       <li>Memory mirroring with release/debug mode support.</li>
       <li>Self-modifying code detection: page generation tracking, SIGSEGV signal handler (Linux), dispatcher eviction, and page re-protection.</li>
       <li>Atomics v0: exclusive monitor, LDXR/STXR decode and execution, LDAR/STLR acquire/release semantics.</li>
       <li>Barrier semantics v0: DMB, DSB, and ISB decode, lift into NxIR, and interpreter/evaluator execution.</li>
-      <li>Guest threading v0: thread state isolation, scheduler with host-thread and fiber modes, and bounded replay logs.</li>
+      <li>Guest threading v0 with thread state isolation, scheduler host-thread and fiber modes, and bounded replay logs.</li>
       <li>Floating-point scalar: FMOV, FADD, FSUB, FMUL, FDIV, FCMP over f64 in interpreter and evaluator.</li>
       <li>SIMD/NEON v0: 128-bit vector registers, v.2d integer and FP add through interpreter, evaluator, and native backend.</li>
       <li>Advanced vector lowering: packed XMM native ops (paddq, addpd, pcmpeqq, pshufd) with AVX-512 mask support.</li>
-      <li>Hot/cold block splitting: profile-guided native block layout without changing dispatcher keys.</li>
-      <li>Native coverage system: functional, static, executed, fastmem, and slowmem penalty metrics in the GUI.</li>
-      <li>Guard and deopt metadata for future speculative optimization.</li>
+    </ul>
+
+    <h3>Homebrew, services, and graphics</h3>
+    <ul>
+      <li>Simple homebrew boot path using Nx86-owned .nxhb.toml descriptors, metadata, code/data/stack mapping, and entrypoint handling.</li>
+      <li>HLE service skeleton maps svc #0 through svc #4 to deterministic filesystem, thread, memory, and input outcomes.</li>
+      <li>Input runtime exposes keyboard, gamepad, and injected test snapshots to homebrew-visible controller state.</li>
+      <li>Guest IPC v0 supports service names, sessions, domains, object handles, result codes, handle transfers, and command/response buffers.</li>
+      <li>Audio runtime skeleton can accept interleaved stereo f32 PCM from a guest IPC audio command buffer.</li>
+      <li>Vulkan backend skeleton can detect/load Vulkan, create a device where available, render an offscreen frame, and surface the rendered-frame path to the GUI.</li>
+      <li>Shader translation skeleton models shader metadata and source hashes, creates deterministic placeholder translations, stores .nxshader cache objects, and adds synthetic shader inputs.</li>
+      <li>Shader AOT compiles a title's whole shader set during initial compile, caches .nxshader objects, uses shared profile hints, and reports shader readiness as a Native Coverage axis.</li>
+      <li>Native Coverage uses a three-axis min-gate (CPU, shader, pipeline) so the weakest axis caps the combined headline.</li>
+      <li>Vulkan pipeline cache infrastructure: PipelineCacheBlob with atomic save/load, PipelineProfileHints, PipelineKey hashing, and a pipeline miss log.</li>
+    </ul>
+
+    <h3>Tooling and tests</h3>
+    <ul>
       <li>Cache manager with .nxo integrity checking, manifest, and atomic writes.</li>
       <li>Runtime profiling: versioned JSONL profiles with typed events, crash-tail recovery, and file locking.</li>
       <li>Profile-guided rebuild promotes JIT-discovered blocks to AOT objects.</li>
       <li>CFG recovery via recursive-descent traversal.</li>
+      <li>Guard and deopt metadata for future speculative optimization.</li>
       <li>Inspector with disassembly, CFG, NxIR dump, and native mapping views.</li>
-      <li>GUI shell with Library, Compile, Tests, Settings, Inspector, and Scheduler screens (egui, Linux).</li>
-      <li>255 passing tests: interpreter, NxIR evaluator, and native execution must all agree.</li>
+      <li>GUI shell with Library, Compile, Tests, Settings, Inspector, Scheduler, and input configuration screens (egui, Linux).</li>
+      <li>343 unit tests pass across the compiler, runtime, VMM, scheduler, services, input, audio, GUI, shader, Vulkan, pipeline cache, and cache layers.</li>
     </ul>
 
     <hr>
@@ -74,11 +98,12 @@
     <h2>Not yet</h2>
     <ul>
       <li>No public downloads.</li>
-      <li>No game import or title boot.</li>
+      <li>No commercial title import or title boot.</li>
       <li>No firmware, keys, or bundled system files.</li>
-      <li>No homebrew execution yet.</li>
+      <li>No real NRO/NSO parsing or Horizon ABI coverage.</li>
+      <li>No real filesystem, thread, memory, input, or audio service coverage beyond deterministic skeletons.</li>
       <li>No conditional branch lowering in native multi-block functions.</li>
-      <li>No Vulkan rendering or shader translation.</li>
+      <li>No real SPIR-V or Maxwell/NVN shader translation or graphics profile feedback yet.</li>
       <li>No Windows or macOS native execution.</li>
     </ul>
 
@@ -86,8 +111,10 @@
 
     <h2>Next</h2>
     <ul>
-      <li>Phase 44: Homebrew Loader v0: load simple homebrew, basic module metadata, entrypoint handling, minimal services.</li>
-      <li>Phase 45: HLE/Service Skeleton: service call dispatch, filesystem, thread, memory, and input service skeletons.</li>
+      <li>Phase 52: Graphics Profile Feedback: log shader and pipeline usage, promote runtime-discovered pipeline data, and feed passive rebuild.</li>
+      <li>Phase 53: Title Behavior Patch System: patch metadata, built-in required patches, undisableable compatibility patches, and patch reporting.</li>
+      <li>Phase 54: GSO v0: guard profile format, speculative target metadata, auto-generated GSO profile, and manual local override.</li>
+      <li>Phase 55: Official Title Profiles: title profile crate, profile registry, title hash matching, compatibility notes, and GSO integration.</li>
     </ul>
 
     <footer>nx86.dev &middot; <a href="https://github.com/nx86-emu">GitHub</a></footer>

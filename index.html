@@ -48,15 +48,12 @@
 
     <h3>Right now</h3>
     <ul>
-      <li>Full compiler pipeline: decode, lift, optimize, verify, lower, package</li>
-      <li>Multi-block dispatcher with emergency JIT fallback</li>
-      <li>Block chaining and fastmem for native-speed execution</li>
-      <li>Self-modifying code detection, atomics v0, barrier semantics, and guest threading v0</li>
-      <li>Floating-point scalar and SIMD/NEON v0 in interpreter and evaluator</li>
-      <li>Advanced packed vector lowering, hot/cold splitting, and native coverage metrics</li>
-      <li>255 passing tests across the full pipeline</li>
-      <li>GUI shell on Linux with Inspector and Scheduler</li>
-      <li>x86_64-v4 as the first target</li>
+      <li>52 development phases are present locally, through the Vulkan pipeline cache infrastructure.</li>
+      <li>Full compiler pipeline: decode, lift to NxIR, optimize, verify, lower to x86_64-v4, and package as .nxo.</li>
+      <li>Runtime cache with dispatcher, emergency JIT, block chaining, fastmem/slowmem, profiling, and three-axis Native Coverage.</li>
+      <li>Simple .nxhb.toml homebrew path with HLE service skeleton, input runtime, guest IPC v0, and audio runtime skeleton.</li>
+      <li>Shader AOT, pipeline cache infrastructure, and a Vulkan backend skeleton.</li>
+      <li>343 passing unit tests across the compiler, runtime, VMM, services, input, audio, shader, Vulkan, and cache slices.</li>
     </ul>
 
     <footer>nx86.dev &middot; <a href="https://github.com/nx86-emu">GitHub</a></footer>

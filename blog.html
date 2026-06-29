@@ -32,6 +32,24 @@
   <div class="content">
     <div id="posts">
 
+      <article data-date="2026-06-28">
+        <h2>Shader AOT and Pipeline Cache</h2>
+        <p class="muted">June 28, 2026</p>
+        <p>Phases 50 and 51 landed. The local tree now has 52 development phases and 343 passing tests.</p>
+        <p>Phase 50 (Shader AOT v0) adds a batch shader compilation pass during initial compile. It translates every shader in a set, caches each as a <code>.nxshader</code> object, and reports shader readiness in basis points. Shared profile hints steer compilation order so hot shaders compile first. Shader readiness feeds into Native Coverage as one axis of a min-gate: the weakest of CPU, shader, and pipeline readiness caps the combined number.</p>
+        <p>Phase 51 (Vulkan Pipeline Cache Integration) adds the pipeline cache infrastructure. <code>PipelineCacheBlob</code> persists opaque Vulkan pipeline cache bytes to disk with atomic writes. <code>PipelineKey</code> is a deterministic FNV-1a hash of shader combination plus render state. A <code>PipelineMissLog</code> records cache misses at runtime for future prioritization. Pipeline readiness is the third axis of the Native Coverage min-gate.</p>
+        <p>Neither phase generates real SPIR-V or creates real Vulkan pipelines yet. The shader translation remains a deterministic placeholder, and the pipeline blob starts empty. The infrastructure is in place so that when real shader compilation arrives (Phase 52+), readiness reporting and cache persistence are already wired.</p>
+        <p>The project still has no public downloads, no commercial title import or title boot, and no firmware, keys, or bundled system files.</p>
+      </article>
+
+      <article data-date="2026-06-27">
+        <h2>Phase 49: Shader Skeleton</h2>
+        <p class="muted">June 27, 2026</p>
+        <p>The local Nx86 tree now has 50 development phases present, through Phase 49. Since the last update, the project added self-modifying code tracking, atomics, barrier semantics, guest threading, scheduler replay, fiber mode, scalar FP, NEON, advanced vector lowering, hot/cold block splitting, native coverage, simple homebrew loading, HLE service skeletons, input runtime, guest IPC v0, an audio runtime skeleton, a Vulkan backend skeleton, and a shader translation skeleton.</p>
+        <p>The graphics work is still a skeleton. Vulkan can be detected and loaded, a device can be created where one is available, an offscreen frame can be rendered, and the rendered-frame path is exposed to the GUI. The shader side can model metadata, hash source bytes, create deterministic placeholder translations, and store <code>.nxshader</code> cache objects. Real SPIR-V generation, Maxwell/NVN shader translation, shader AOT, pipeline cache integration, and graphics profile feedback are still future work.</p>
+        <p>The project still has no public downloads, no commercial title import or title boot, and no firmware, keys, or bundled system files. The current homebrew path uses Nx86-owned <code>.nxhb.toml</code> descriptors rather than real NRO/NSO parsing or Horizon ABI coverage.</p>
+      </article>
+
       <article data-date="2026-06-24">
         <h2>33 Phases Done</h2>
         <p class="muted">June 24, 2026</p>

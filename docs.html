@@ -30,23 +30,18 @@
   </nav>
 
   <div class="content">
-    <h2>Documentation</h2>
-    <p>Reference and guides for Nx86 and the NDX modloader.</p>
+    <h2><a href="status.html">Status</a></h2>
+    <p>50 phases in locally. The compiler pipeline, runtime, threading skeleton, FP/SIMD, homebrew path, service skeletons, input, guest IPC/audio skeleton, Vulkan backend skeleton, shader translation skeleton, and GUI shell are present. Tracks what runs today, what is still missing, and what the next graphics phases cover.</p>
 
     <hr>
 
-    <h3><a href="status.html">Status</a></h3>
-    <p>Current project state: what works, what does not, and what is next.</p>
+    <h2><a href="technical.html">Technical Details</a></h2>
+    <p>How Nx86 works under the hood. Covers the full compiler pipeline (decode, lift to NxIR, optimize, lower to x86_64-v4), the memory model, block chaining, fastmem and slowmem paths, runtime profiling, services, graphics scaffolding, and the test system.</p>
 
     <hr>
 
-    <h3><a href="technical.html">Technical Details</a></h3>
-    <p>How Nx86 works under the hood: the compiler pipeline, NxIR, memory model, and testing.</p>
-
-    <hr>
-
-    <h3><a href="ndx/index.html">NDX</a></h3>
-    <p>NDX (N Dynamic X) is Nx86's built-in modloader. Documentation for installing, creating, and managing mods.</p>
+    <h2><a href="ndx/index.html">NDX</a></h2>
+    <p>NDX is Nx86's built-in modloader. Covers installing mods, creating <code>.ndx</code> packages, writing <code>nxmod.toml</code>, managing profiles, cheats, repositories, and the trust and safety model.</p>
 
     <footer>nx86.dev &middot; <a href="https://github.com/nx86-emu">GitHub</a></footer>
   </div>
